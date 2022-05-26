@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+</head>
+<body>
+<th:block th:fragment="assets">
+    <!-- JavaScripts
+    ============================================= -->
+    <script src="js/jquery.js"></script>
+    <script src="js/plugins.min.js"></script>
+    <!-- TinyMCE Plugin -->
+    <script src="js/components/tinymce/tinymce.min.js"></script>
+    <!-- Footer Scripts
+    ============================================= -->
+    <script src="js/functions.js"></script>
+
+    <script>
+        tinymce.init({
+            selector: '#post-message',
+            menubar: false,
+            setup: function(editor) {
+                editor.on('change', function(e) {
+                    editor.save();
+                });
+            }
+        });
+        tinymce.init({
+            selector: 'textarea',
+            menubar: false,
+            setup: function(editor) {
+                editor.on('change', function(e) {
+                    editor.save();
+                });
+            }
+        });
+    </script>
+
+</th:block>
+</body>
+</html>

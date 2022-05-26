@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="BlackPhoenixProductions" />
+
+	<div th:replace="stylesheets :: stylesheets"></div>
+
+	<!-- Document Title
+	============================================= -->
+	<title>Forum | BlackPhoenixProductions</title>
+
+</head>
+
+<body class="stretched search-overlay">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper" class="clearfix">
+
+
+		<!-- navbar thymeleaf fragment -->
+		<div th:insert="navbar :: navbar"></div>
+
+
+		<!-- Slider
+		============================================= -->
+		<section id="slider" class="slider-element bg-color">
+			<div class="container">
+				<div class="row h-100">
+					<div class="col-lg-6 d-flex align-self-center flex-column pt-5 pb-0 py-lg-6 mb-0 my-lg-4">
+						<p th:if = "${user != null}" class="mb-3 text-larger font-weight-light">Ciao, <strong class="font-weight-bold"><u th:text= "${user.username}"></u></strong></p>
+						<h2 class="display-4" style="font-weight: 800">Benvenuto nel nostro Forum!</h2>
+
+						<form th:action="@{/search}" class="row" action="#" method="get">
+							<div class="input-group input-group-lg mt-2 mb-4">
+								<input class="form-control rounded-left border-0" type="search" placeholder="Cerca un Topic..." aria-label="Search" name="title">
+								<div class="input-group-append">
+									<button class="btn btn-light border-0" type="submit"><i class="icon-line-search"></i></button>
+								</div>
+							</div>
+						</form>
+
+						<div>
+							<a th:if = "${user != null}" href="#" data-toggle="modal" data-target="#modal-signin" class="button button-large border border-width-2 bg-alt py-2 rounded-sm font-weight-medium nott ls0 ml-0 ml-sm-1 h-op-09"><i class="icon-line-file-add"></i>Crea un nuovo Topic</a>
+							<a href="search" class="button button-large button-border rounded-sm font-weight-medium nott h-bg-alt ls0 ml-0"><i class="icon-line-align-left"></i>Sfoglia tutti i Topic</a>
+						</div>
+					</div>
+
+					<div class="col-lg-6 d-flex align-self-end flex-column">
+						<img src="demos/forum/images/hero.svg" alt="Hero Image" style="z-index: 3; transform: translateY(45px);">
+					</div>
+				</div>
+			</div>
+			<div class="bg-alt py-5">
+				<div class="container">
+					<div class="d-flex">
+						<h4 class="mb-0"><span class="counter counter-inherit font-weight-normal text-white"><i class="icon-line-users icon-fw"></i> <span class="color font-weight-semibold" data-from="0" th:attr="data-to=${totalusers}" data-refresh-interval="150" data-speed="2000"></span> Utenti Registrati.</span></h4>
+						<h4 class="mb-0 ml-5"><span class="counter counter-inherit font-weight-normal text-white"><i class="icon-line-message-circle icon-fw"></i> <span class="color font-weight-semibold" data-from="0" th:attr="data-to=${totaltopics}" data-refresh-interval="100" data-speed="2000"></span> Discussioni Aperte.</span></h4>
+						<h4 class="mb-0 ml-5"><span class="counter counter-inherit font-weight-normal text-white"><i class="icon-line-message-circle icon-fw"></i> <span class="color font-weight-semibold" data-from="0" th:attr="data-to=${totalposts}" data-refresh-interval="100" data-speed="2000"></span> Risposte.</span></h4>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Content
+		============================================= -->
+		<section id="content">
+			<div class="content-wrap">
+				<div class="container">
+
+					<div class="row justify-content-center text-center mb-5">
+						<div class="col-xl-6 col-lg-8">
+							<h3 class="display-4 font-weight-bolder mb-3">Ultime Discussioni</h3>
+							<a th:if = "${user != null}" href="#" data-toggle="modal" data-target="#modal-signin" class="button button-small button-border button-rounded  mx-0">Crea un nuovo Topic</a>
+						</div>
+					</div>
+
+					<div class="mw-md mx-auto" th:if = "${pagedTopics != null}">
+						<ul class="list-unstyled mb-4">
+							<li>
+								<!-- init LISTA ULTIMI TOPIC -->
+								<ul class="topic list-unstyled row mx-0 justify-content-between align-items-center" th:each="topic : ${pagedTopics.content}">
+									<li class="entry mb-0 col-sm-10">
+										<a th:href="${'viewtopic?id=' + (topic.content.id)}"><h3 class="mb-0" th:text="${topic.content.title}"></h3></a>
+										<div class="entry-meta mt-1">
+											<ul>
+												<li th:text="${topic.content.timeDifferenceFromNow}"></li>
+												<li th:text="${topic.content.postsNumber} + ' Risposte' "></li>
+											</ul>
+										</div>
+									</li>
+								</ul>
+								<!-- end LISTA ULTIMI TOPIC -->
+							</li>
+						</ul>
+
+						<ul class="pagination justify-content-end">
+							<div th:if="${pagedTopics.metadata.number == 0}">
+								<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+							</div>
+							<div th:if="${pagedTopics.metadata.number != 0}">
+								<li class="page-item"><a class="page-link" th:href="${'forum?page=' + (pagedTopics.metadata.number -1)}" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+							</div>
+							<ul class="pagination justify-content-end"  th:each="i: ${#numbers.sequence(1, pagedTopics.metadata.totalPages)}">
+								<div th:if="${pagedTopics.metadata.totalPages != 0}">
+									<div th:if="${pagedTopics.metadata.number == (i-1)}">
+										<li class="page-item active"><a class="page-link" th:href="${'forum?page=' + (i-1)}" th:text="${i}"></a></li>
+									</div>
+									<div th:if="${pagedTopics.metadata.number != (i-1)}">
+										<li class="page-item"><a class="page-link" th:href="${'forum?page=' + (i-1)}" th:text="${i}"></a></li>
+									</div>
+								</div>
+							</ul>
+							<div th:if="${pagedTopics.metadata.totalPages == 0}">
+								<ul class="pagination justify-content-end">
+									<li class="page-item active"><a class="page-link" th:href="${'forum?page=0'}" th:text="${1}" ></a></li>
+								</ul>
+							</div>
+
+							<div th:if="${( (pagedTopics.metadata.number + 1) == pagedTopics.metadata.totalPages ) || pagedTopics.metadata.totalPages == 0}">
+								<li class="page-item disabled"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+							</div>
+							<div th:if="${( (pagedTopics.metadata.number + 1) != pagedTopics.metadata.totalPages ) && pagedTopics.metadata.totalPages != 0}">
+								<li class="page-item"><a class="page-link" th:href="${'forum?page=' + (pagedTopics.metadata.number +1)}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+							</div>
+						</ul>
+					</div>
+
+				</div>
+            <!--
+				<div class="section py-6 my-6" style="background-color: #bfd5dbab">
+					<div class="container">
+						<div class="row align-items-center col-mb-50">
+							<div class="col-md-6">
+								<img src="demos/forum/images/doc.svg" alt="Doc Image">
+							</div>
+							<div class="col-md-6">
+								<h2 class="display-4 mb-4 font-weight-bold">Our Documentation</h2>
+								<p>Continually leverage existing reliable users without seamless e-commerce. Professionally mesh interoperable solutions rather than highly efficient infrastructures. Monotonectally administrate tactical functionalities.</p>
+								<a href="#" class="button button-large bg-alt text-white font-weight-medium py-2 rounded-sm ml-0 ls0 nott"><i class="icon-line-paper"></i>View Documentation</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			-->
+				<div class="clear"></div>
+
+				<!--
+				<div class="container my-4">
+					<div class="row justify-content-center text-center mb-5">
+						<div class="col-lg-6">
+							<h3 class="display-4 font-weight-bolder mb-3">Most Helpful Members</h3>
+							<p>Without seamless e-commerce professionally mesh</p>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-lg-6">
+							<div class="row justify-content-center col-mb-30 gutter-50 text-center">
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/jzY0KRJopEI/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Jim Séchen</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/WNoLnJo7tS8/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Alan Fresco</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/JQFHdpOKz2k/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Fig Nelson</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/FsWi0sBoi8c/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Pelican Steve</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/UcgYvGPqQQ8/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Pelican Steve</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/5vg_SarQimA/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Russell Sprout</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/WZz1u5R5uT4/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Sir Cumference</a></h5>
+								</div>
+								<div class="col-md-3 col-4">
+									<img src="https://source.unsplash.com/uBqskoy6TW8/120x120" alt="Memebers" width="80" class="rounded-circle mb-2">
+									<h5 class="font-weight-medium"><a href="forum-profile.html">Theodore Handle</a></h5>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			-->
+
+			</div>
+		</section><!-- #content end -->
+
+		<!-- footer thymeleaf fragment -->
+		<div th:insert="footer :: footer"></div>
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="icon-angle-up"></div>
+
+	<script th:replace="sseclient :: sseclient"></script>
+	<script th:replace="assets :: assets"></script>
+
+
+	<script>
+		jQuery(document).ready( function(){
+
+			$('input[type="file"]').change(function(e){
+				var fileName = e.target.files[0].name;
+				$('.custom-file-label').html(fileName);
+			});
+
+
+			$(function(){
+		      if(window.location.hash) {
+		          var hash = window.location.hash;
+		          $(hash).modal('toggle');
+		      }
+		  });
+		});
+	</script>
+
+	</body>
+	</html>

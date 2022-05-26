@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <script th:fragment="sseclient" th:inline="javascript">
+
+        function isFunction(functionToCheck) {
+            return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+        }
+
+        function debounce(func, wait) {
+            var timeout;
+            var waitFunc;
+
+            return function() {
+                if (isFunction(wait)) {
+                    waitFunc = wait;
+                }
+                else {
+                    waitFunc = function() { return wait };
+                }
+
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    func.apply(context, args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, waitFunc());
+            };
+        }
+
+        // reconnectFrequencySeconds doubles every retry
+        var reconnectFrequencySeconds = 1;
+        var evtSource;
+
+        var reconnectFunc = debounce(function() {
+            initialize();
+            // Double every attempt to avoid overwhelming server
+            reconnectFrequencySeconds *= 2;
+            // Max out at ~1 minute as a compromise between user experience and server load
+            if (reconnectFrequencySeconds >= 64) {
+                reconnectFrequencySeconds = 64;
+            }
+        }, function() { return reconnectFrequencySeconds * 1000 });
+
+        function initialize() {
+            /*<![CDATA[*/
+            var username = /*[[${user?.username}]]*/ null;
+            var token = /*[[${token}]]*/ null;
+            var sseBackend = /*[[${sseBackend}]]*/ null;
+            /*]]>*/
+
+            if (username != null && token != null) {
+                console.log('logged: ' + username);
+                const eventSource = new EventSourcePolyfill(sseBackend + '/api/subscribe?username=' + username, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                eventSource.onmessage = e => {
+                    const msg = e.data;
+                    console.log(msg);
+                    if(msg.includes("notification")){
+                        $('#replace_div').load('notification', function (response, status, xhr) {
+                            if (status == "error") {
+                                console.log("Errore: " + xhr.status + " " + xhr.statusText);
+                            }
+                            else {
+                                document.getElementById("notification-bell").classList.add('notification-badge');
+                            }
+                        });
+                    }
+                };
+                eventSource.onopen = e => {
+                    console.log('open')
+                    reconnectFrequencySeconds = 1;
+                };
+                eventSource.onerror = e => {
+                    if (e.readyState == EventSource.CLOSED) {
+                        console.log('close');
+                    } else {
+                        console.log(e);
+                    }
+                    // chiudo e riconnetto
+                    eventSource.close();
+                    reconnectFunc();
+                };
+                eventSource.addEventListener('second', function (e) {
+                    console.log('second', e.data);
+                }, false);
+            }
+
+        }
+        window.onload = initialize;
+    </script>
+</head>
+<body>
+<script th:fragment="sseclient" src="js/eventsource-polyfill.js"></script>
+</body>
+</html>

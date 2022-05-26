@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="BlackPhoenixProductions" />
+
+	<div th:replace="stylesheets :: stylesheets"></div>
+
+
+	<!-- Document Title
+	============================================= -->
+	<title>Cerca | BlackPhoenixProductions</title>
+
+</head>
+
+<body class="stretched search-overlay">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper" class="clearfix">
+
+		<!-- navbar thymeleaf fragment -->
+		<div th:insert="navbar :: navbar"></div>
+
+		<!-- Page Title
+		============================================= -->
+		<section id="page-title" class="bg-color py-6 page-title-center text-center">
+			<div class="container">
+				<h2 class="h1 mb-3">Cerca un Topic</h2>
+				<div class="clear"></div>
+				<form th:action="@{/search}" class="row" action="#" method="get">
+					<div class="input-group input-group-lg mt-2 mb-4 mw-sm mx-auto my-4">
+						<!-- funzione di ricerca topic -->
+							<input class="form-control rounded-left border-0 font-weight-semibold" type="search" placeholder="Scrivi il titolo..." th:value="${title}" aria-label="Search" name="title">
+							<div class="input-group-append">
+								<button class="btn border-0 bg-white rounded-right h-bg-alt" type="submit"><i class="icon-line-search"></i></button>
+							</div>
+					</div>
+				</form>
+
+				<div>
+					<a href="search" class="button button-large bg-alt py-2 rounded-sm font-weight-medium nott ls0 ml-0">Sfoglia Tutti i Topic</a>
+					<a th:if = "${user != null}" href="#" data-toggle="modal" data-target="#modal-signin" class="button button-large bg-alt py-2 rounded-sm font-weight-medium nott ls0 ml-0 ml-sm-1"><i class="icon-line-file-add"></i>Crea un nuovo Topic</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Content
+		============================================= -->
+		<section id="content">
+			<div class="content-wrap">
+				<div class="container mw-md">
+
+					<div class="mw-md mx-auto">
+
+						<div class="mw-md mx-auto" th:if = "${pagedTopics != null}">
+							<ul class="list-unstyled mb-4">
+								<li>
+									<!-- init LISTA ULTIMI TOPIC -->
+									<ul class="topic list-unstyled row mx-0 justify-content-between align-items-center" th:each="topic : ${pagedTopics.content}">
+										<li class="entry mb-0 col-sm-10">
+											<a th:href="${'viewtopic?id=' + (topic.content.id)}"><h3 class="mb-0" th:text="${topic.content.title}"></h3></a>
+											<div class="entry-meta mt-1">
+												<ul>
+													<li th:text="${topic.content.timeDifferenceFromNow}"></li>
+													<li th:text="${topic.content.postsNumber} + ' Risposte' "></li>
+												</ul>
+											</div>
+										</li>
+									</ul>
+									<!-- end LISTA ULTIMI TOPIC -->
+								</li>
+							</ul>
+
+							<ul class="pagination justify-content-end">
+								<div th:if="${pagedTopics.metadata.number == 0}">
+									<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+								</div>
+								<div th:if="${pagedTopics.metadata.number != 0}">
+									<li class="page-item"><a class="page-link" th:href="${'search?page=' + (pagedTopics.metadata.number -1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+								</div>
+								<ul class="pagination justify-content-end"  th:each="i: ${#numbers.sequence(1, pagedTopics.metadata.totalPages)}">
+									<div th:if="${pagedTopics.metadata.totalPages != 0}">
+										<div th:if="${pagedTopics.metadata.number == (i-1)}">
+											<li class="page-item active"><a class="page-link" th:href="${'search?page=' + (i-1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" th:text="${i}"></a></li>
+										</div>
+										<div th:if="${pagedTopics.metadata.number != (i-1)}">
+											<li class="page-item"><a class="page-link" th:href="${'search?page=' + (i-1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" th:text="${i}"></a></li>
+										</div>
+									</div>
+								</ul>
+								<div th:if="${pagedTopics.metadata.totalPages == 0}">
+									<ul class="pagination justify-content-end">
+										<li class="page-item active"><a class="page-link" th:href="${'search?page=0' + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" th:text="${1}" ></a></li>
+									</ul>
+								</div>
+
+								<div th:if="${( (pagedTopics.metadata.number + 1) == pagedTopics.metadata.totalPages ) || pagedTopics.metadata.totalPages == 0}">
+									<li class="page-item disabled"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+								</div>
+								<div th:if="${( (pagedTopics.metadata.number + 1) != pagedTopics.metadata.totalPages ) && pagedTopics.metadata.totalPages != 0}">
+									<li class="page-item"><a class="page-link" th:href="${'search?page=' + (pagedTopics.metadata.number +1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+								</div>
+							</ul>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</section><!-- #content end -->
+
+		<!-- footer thymeleaf fragment -->
+		<div th:insert="footer :: footer"></div>
+
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="icon-angle-up"></div>
+
+	<script th:replace="sseclient :: sseclient"></script>
+	<script th:replace="assets :: assets"></script>
+
+
+
+</body>
+</html>

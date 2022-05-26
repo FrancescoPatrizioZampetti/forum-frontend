@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    </head>
+    <body>
+        <div th:fragment="notification_fragment">
+            <div id="mynotification" class="header-misc-icon">
+                <a href="#"  id="notifylink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="12,12"><i id="notification-bell" class="icon-line-bell"></i></a>
+                <div class="dropdown-menu dropdown-menu-right py-0 m-0 overflow-auto" aria-labelledby="notifylink" style="width: 320px; max-height: 300px">
+                    <span class="dropdown-header border-bottom border-f5 font-weight-medium text-uppercase ls1">Notifiche</span>
+                    <div class="list-group list-group-flush" th:each="notification : ${notificationList}">
+                        <a th:href="${domain} + ${notification.url}" class="d-flex list-group-item">
+                            <img src="demos/forum/images/user.png" width="35" height="35" class="rounded-circle mr-3 mt-1" alt="Profile" th:if= "${notification.fromUser.role != 'STAFF'}">
+                            <img src="demos/forum/images/staff.png" width="35" height="35" class="rounded-circle mr-3 mt-1" alt="Profile" th:if= "${notification.fromUser.role == 'STAFF'}">
+                            <div class="media-body">
+                                <h5 class="my-0 font-weight-normal text-muted"><span class="text-dark font-weight-bold" th:text="${notification.fromUser.username}"></span> ha risposto al tuo topic <span class="text-dark font-weight-bold" th:text="${notification.topic.title}"/> dicendo: <span class="text-dark font-weight-bold" th:utext="${notification.message}"></span></h5>
+                                <small class="text-smaller" th:text="${notification.timeDifferenceFromNow}"></small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/jquery.js" th:fragment="notification_fragment" th:inline="javascript"></script>
+
+        <script th:fragment="notification_fragment" th:inline="javascript">
+            /*<![CDATA[*/
+            var userNotificationStatus = /*[[${userNotificationStatus}]]*/ null;
+            /*]]>*/
+
+            $(document).ready(function() {
+
+                if (userNotificationStatus != null && userNotificationStatus === true){
+                    document.getElementById("notification-bell").classList.add('notification-badge');
+                }
+
+                $("#notifylink").click(function() {
+                    var nomeClasse = document.getElementById("notification-bell").className;
+                    if(nomeClasse.includes('notification-badge')) {
+                        $.ajax({
+                            url: "readedNotification",
+                            context: document.body
+                        }).done(function() {
+                            document.getElementById("notification-bell").classList.remove('notification-badge');
+                        });
+                    }
+                });
+            });
+        </script>
+
+    </body>
+</html>

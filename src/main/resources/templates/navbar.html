@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+</head>
+
+    <body>
+        <div th:fragment="navbar">
+            <!-- Modal -->
+            <div class="modal fade" id="modal-signin" tabindex="-1" aria-labelledby="modal-signin" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content bg-white p-4 p-md-5 rounded">
+                        <h3 class="h2 font-weight-bolder mb-4">Crea un nuovo Topic</h3>
+
+    <!--                    <form class="row mb-0" action="#" method="post" enctype="multipart/form-data">-->
+                        <form th:action="@{/createTopic}" th:object = "${topic}" class="row mb-0" method="post">
+                            <div class="col-12 form-group">
+                                <label for="title">Titolo del Topic</label><br>
+                                <input type="text" id="title" name="title" minlength="5" maxlength="50" size="26" required><br>
+                            </div>
+                            <div class="col-12 form-group mb-4">
+                                <label for="post-message">Messaggio</label><br>
+                                <textarea name="message" id="post-message" class="form-control" cols="30" rows="10" required></textarea>
+                            </div>
+                            <div class="clear"></div>
+                            <!-- INIZIO upload -->
+    <!--                        <div class="col-6 form-group">-->
+    <!--                            <small class="text-muted">Grandezza massima consentita di 2048 KB.</small>-->
+    <!--                            <div class="custom-file">-->
+    <!--                                <input type="file" class="custom-file-input" id="file-input">-->
+    <!--                                <label class="custom-file-label nott ls0 mb-0 font-weight-normal" for="file-input">Choose file</label>-->
+    <!--                            </div>-->
+    <!--                        </div>-->
+                            <!-- FINE upload -->
+                            <div class="clear"></div>
+
+                            <div class="col-12 form-group">
+<!--                                <div th:if = "${user != null && user.role == 'STAFF'}"class="form-check form-check-inline">-->
+<!--                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="pinned">-->
+<!--                                    <label class="form-check-label nott ls0 mb-0 font-weight-semibold" for="inlineCheckbox1">Evidenzia</label>-->
+<!--                                </div>-->
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="emailUser">
+                                    <label class="form-check-label nott ls0 mb-0 font-weight-semibold" for="inlineCheckbox2">Mandami una Email quando qualcuno risponde</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" name="submit" class="button button-large bg-alt border border-width-2 rounded-sm font-weight-medium nott ls0 ml-0">Invia</button>
+
+                                <button type="button" data-dismiss="modal" aria-label="Close" class="button button-large button-border border-default h-bg-danger rounded-sm font-weight-medium nott ls0 ml-0">Cancella</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header
+            ============================================= -->
+            <header id="header" class="full-header header-size-md dark" data-sticky-shrink="false" data-sticky-offset="full" data-sticky-offset-negative="100">
+                <div id="header-wrap">
+                    <div class="container">
+                        <div class="header-row">
+
+                            <!-- Logo
+                            ============================================= -->
+                            <div id="logo">
+                                <a href="forum" class="standard-logo"><img src="demos/forum/images/blackphoenix.png" alt="Canvas Logo"></a>
+                                <a href="forum" class="retina-logo"><img src="demos/forum/images/blackphoenix@2x.png" alt="Canvas Logo"></a>
+                            </div><!-- #logo end -->
+
+                            <!-- logged out user  -->
+                            <div class="header-misc" th:if = "${user == null}">
+                                <a href="login" class="button button-border border-default px-4 rounded-sm font-weight-medium nott ls0 m-0 px-3 h-op-09">Sign In</a>
+                            </div>
+
+                            <!-- INIZIO menu utente loggato -->
+                            <div class="header-misc ml-0" th:if = "${user != null}">
+
+                                <!-- NOTIFICATION
+                                ============================================= -->
+                                <div id="replace_div">
+                                    <div th:insert="notification :: notification_fragment"></div>
+                                </div>
+
+                                <!-- Top Account
+                                ============================================= -->
+                                <div class="header-misc-icon profile-image">
+                                    <a href="#" id="profilelink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="12,12"><img class="rounded-circle" src="demos/forum/images/user.png" alt="User"></a>
+                                    <div class="dropdown-menu dropdown-menu-right py-0 m-0" aria-labelledby="profilelink">
+<!--                                        <a class="dropdown-item" href="/profile" style="color: white;"><i class="icon-line-edit mr-2"></i>Modifica Profilo</a>-->
+                                        <a class="dropdown-item" th:href="${'/search?username=' + user.username}" style="color: white;"><i class="icon-line-align-left mr-2"></i>I tuoi Topic</a>
+                                        <a class="dropdown-item" href="logout" style="color: white;"><i class="icon-line-log-out mr-2"></i>Log Out</a>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- FINE menu utente loggato -->
+
+                            <div id="primary-menu-trigger">
+                                <svg class="svg-trigger" viewBox="0 0 100 100"><path d="m 30,33 h 40 c 3.722839,0 7.5,3.126468 7.5,8.578427 0,5.451959 -2.727029,8.421573 -7.5,8.421573 h -20"></path><path d="m 30,50 h 40"></path><path d="m 70,67 h -40 c 0,0 -7.5,-0.802118 -7.5,-8.365747 0,-7.563629 7.5,-8.634253 7.5,-8.634253 h 20"></path></svg>
+                            </div>
+
+                            <!-- Primary Navigation
+                            ============================================= -->
+                            <nav class="primary-menu">
+
+                                <ul class="menu-container">
+                                    <li class="menu-item"><a class="menu-link" href="forum"><div>Home</div></a></li>
+
+                                    <li class="menu-item"><a class="menu-link" href="#" data-toggle="modal" data-target="#modal-signin" th:if = "${user != null}"><div>Nuovo</div></a></li>
+                                    <li class="menu-item"><a class="menu-link" href="/profile" th:if = "${user != null}"><div>Profilo</div></a></li>
+
+                                    <li class="menu-item"><a class="menu-link" href="search"><div>Cerca</div></a></li>
+                                  <!--  <li class="menu-item"><a class="menu-link" href="login"><div>Log In</div></a></li> -->
+                                </ul>
+                            </nav><!-- #primary-menu end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="header-wrap-clone"></div>
+            </header><!-- #header end -->
+        </div>
+    </body>
+
+</html>

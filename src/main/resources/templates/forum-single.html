@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="BlackPhoenixProductions" />
+
+	<div th:replace="stylesheets :: stylesheets"></div>
+
+
+	<!-- Document Title
+	============================================= -->
+	<title>Dettaglio topic | BlackPhoenixProduction</title>
+
+</head>
+
+<body class="stretched search-overlay">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper" class="clearfix">
+
+		<!-- navbar thymeleaf fragment -->
+		<div th:insert="navbar :: navbar"></div>
+
+		<!-- Page Title
+		============================================= -->
+		<section id="page-title" class="bg-color py-6 page-title-center text-center">
+			<div class="container">
+				<h2 class="h2" style="font-weight: 800" th:text= "${topic.title}"></h2>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a class="alt-color" href="/forum">Forum</a></li>
+					<li class="breadcrumb-item text-black-50 active" aria-current="page" th:text= "${topic.title}"></li>
+				</ol>
+			</div>
+		</section>
+
+		<!-- Content
+		============================================= -->
+		<section id="content">
+			<div class="content-wrap">
+				<div class="container mw-md">
+
+					<!-- START messaggio topic -->
+					<div class="topic-post reply mt-5 p-4 p-md-5" id="risp1">
+						<div class="row no-gutters justify-content-between align-items-center border-top border-bottom py-3 mb-4 border-color">
+							<div class="col-9">
+								<div class="d-flex align-items-center">
+									<img src="demos/forum/images/user.png"  alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${topic.user.role != 'STAFF'}">
+									<img src="demos/forum/images/staff.png" alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${topic.user.role == 'STAFF'}">
+									<div>
+										<span class="mb-0 h6 font-weight-semibold align-middle" th:text= "${topic.user.username}"></span>
+										<span class="badge badge-info text-white p-1 ml-1" th:if= "${topic.user.role == 'STAFF'}">Staff</span>
+										<br>
+										<small class="text-muted mb-0 font-weight-normal" th:text= "${topic.formattedDate}"></small>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-auto">
+								<a href="#" id="editlink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-line-ellipsis icon-2x alt-color"></i></a>
+								<div th:if="${user != null}" class="dropdown-menu dropdown-menu-links rounded shadow-sm dropdown-menu-right py-0 m-0" aria-labelledby="editlink">
+									<a th:if="${user.role == 'STAFF'}" th:onclick="return showEditTopic([[${topic.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
+									<a class="dropdown-item" href="#message-reply" th:onclick="return addQuoteTopic([[${topic.id}]]);" data-scrollto="#message-reply"><i class="icon-line-corner-up-left mr-2"></i>Reply</a>
+								</div>
+							</div>
+						</div>
+
+						<div class="clear"></div>
+
+						<div th:id = "topicmessage" th:utext= "${topic.message}"></div>
+
+						<!-- START EDITED TOPIC -->
+						<div th:id="edittopic + ${topic.id}" th:if="${user != null}" style="display: none;">
+							<form th:action="@{/editTopic}" th:object = "${topic}" class="row" action="#" method="post">
+								<div class="col-12 form-group mb-4">
+									<textarea name="message" id="messageReply2" class="form-control" cols="30" rows="10" required>[[${topic.message}]]</textarea>
+								</div>
+								<input type="hidden" name="topicId" th:attr="value = ${topic.id}"/>
+								<input type="hidden" name="pageNumber" th:attr="value = ${pagedPosts.metadata.number}"/>
+								<div class="col-12">
+									<button type="submit" name="submit" class="button button-large bg-alt py-2 rounded-sm font-weight-medium nott ls0 ml-0">Modifica</button>
+								</div>
+							</form>
+						</div>
+						<!-- END EDITED TOPIC -->
+
+						<!-- edit date -->
+						<div th:if="${topic.formattedEditDate != null}" >
+							<hr>
+							<p class="text-muted mb-0 font-weight-normal" th:text= "${topic.formattedEditDate}"></p>
+						</div>
+					
+
+						<div class="col-1 pb-3 px-0">
+							<hr>
+						</div>
+
+					</div>
+					<!-- END messaggio topic -->
+
+
+					<!-- START posts-->
+					<div class="topic-post mt-5 p-4 p-md-5 border-top border-width-5" th:each="post : ${pagedPosts.content}">
+						<div class="row no-gutters justify-content-between align-items-center border-top border-bottom py-3 mb-4">
+							<div class="col-9">
+								<div class="d-flex align-items-center">
+									<img src="demos/forum/images/user.png"  alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${post.content.user.role != 'STAFF'}">
+									<img src="demos/forum/images/staff.png" alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${post.content.user.role == 'STAFF'}">
+									<div>
+										<span class="mb-0 h6 font-weight-semibold align-middle" th:text= "${post.content.user.username}"></span>
+										<span class="badge badge-info text-white p-1 ml-1" th:if= "${post.content.user.role == 'STAFF'}">Staff</span>
+										<br>
+										<small class="text-muted mb-0 font-weight-normal" th:text= "${post.content.formattedCreateDate}"></small>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-auto">
+								<a href="#" id="editlink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-line-ellipsis icon-2x alt-color"></i></a>
+								<div th:if="${user != null}" class="dropdown-menu dropdown-menu-links rounded shadow-sm dropdown-menu-right py-0 m-0" aria-labelledby="editlink2">
+									<a th:if="${user.username == post.content.user.username || user.role == 'STAFF'}" th:onclick="return showEditPost([[${post.content.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
+									<a class="dropdown-item" href="#message-reply" th:onclick="return addQuote([[${post.content.id}]]);" data-scrollto="#message-reply"><i class="icon-line-corner-up-left mr-2"></i>Reply</a>
+								</div>
+							</div>
+
+						</div>
+						<div th:id = "postmessage + ${post.content.id}" th:utext= "${post.content.message}"></div>
+
+						<!-- edit date -->
+						<div th:if="${post.content.formattedEditDate != null}" >
+							<hr>
+							<p class="text-muted mb-0 font-weight-normal" th:text= "${post.content.formattedEditDate}"></p>
+						</div>
+
+
+						<!-- START EDITED POST -->
+						<div th:id="editpost + ${post.content.id}" th:if="${user != null}" style="display: none;">
+							<form th:action="@{/editPost}" th:object = "${post}" class="row" action="#" method="post">
+								<div class="col-12 form-group mb-4">
+									<textarea name="message" id="message" class="form-control" cols="30" rows="10" required>[[${post.content.message}]]</textarea>
+								</div>
+								<input type="hidden" name="topicId" th:attr="value = ${topic.id}"/>
+								<input type="hidden" name="pageNumber" th:attr="value = ${pagedPosts.metadata.number}"/>
+								<input type="hidden" name="postId" th:attr="value = ${post.content.id}"/>
+								<div class="col-12">
+									<button type="submit" name="submit" class="button button-large bg-alt py-2 rounded-sm font-weight-medium nott ls0 ml-0">Modifica</button>
+								</div>
+							</form>
+						</div>
+						<!-- END EDITED POST -->
+
+					</div>
+					<!-- END posts-->
+
+
+					<!-- PAGINATION -->
+					<div style="margin-top: 20px;">
+						<ul class="pagination justify-content-end">
+							<div th:if="${pagedPosts.metadata.number == 0}">
+								<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+							</div>
+							<div th:if="${pagedPosts.metadata.number != 0}">
+								<li class="page-item"><a class="page-link" th:href="${'viewtopic?id=' + (topic.id) + '&page=' + (pagedPosts.metadata.number -1)}" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+							</div>
+							<ul class="pagination justify-content-end" th:each="i: ${#numbers.sequence(1, pagedPosts.metadata.totalPages)}">
+								<div th:if="${pagedPosts.metadata.totalPages != 0}">
+									<div th:if="${pagedPosts.metadata.number == (i-1)}">
+										<li class="page-item active"><a class="page-link" th:href="${'viewtopic?id=' + (topic.id) + '&page=' + (i-1)}" th:text="${i}"></a></li>
+									</div>
+									<div th:if="${pagedPosts.metadata.number != (i-1)}">
+										<li class="page-item"><a class="page-link" th:href="${'viewtopic?id=' + (topic.id) + '&page=' + (i-1)}" th:text="${i}"></a></li>
+									</div>
+								</div>
+							</ul>
+							<div th:if="${pagedPosts.metadata.totalPages == 0}">
+								<ul class="pagination justify-content-end" >
+									<li class="page-item active"><a class="page-link" th:href="${'viewtopic?id=' + (topic.id) + '&page=0'}" th:text="${1}" ></a></li>
+								</ul>
+							</div>
+							<div th:if="${( (pagedPosts.metadata.number + 1) == pagedPosts.metadata.totalPages ) || pagedPosts.metadata.totalPages == 0}">
+								<li class="page-item disabled"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+							</div>
+							<div th:if="${( (pagedPosts.metadata.number + 1) != pagedPosts.metadata.totalPages ) && pagedPosts.metadata.totalPages != 0}">
+								<li class="page-item"><a class="page-link" th:href="${'viewtopic?id=' + (topic.id) + '&page=' + (pagedPosts.metadata.number+1)}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+							</div>
+						</ul>
+					</div>
+
+
+					<!-- RISPOSTA -->
+					<div id="message-reply" class="topic-form mt-5" th:if = "${user != null}" >
+						<h3 class="h2 font-weight-bolder mb-4">Rispondi</h3>
+						<form th:action="@{/createPost}" th:object = "${post}" class="row" action="#" method="post">
+							<div class="col-12 form-group mb-4">
+								<textarea name="message" id="messageReply" class="form-control" cols="30" rows="10" required></textarea>
+							</div>
+							<input type="hidden" name="topicId" th:attr="value = ${topic.id}"/>
+
+							<div class="clear"></div>
+
+<!--							<div class="col-6 form-group">-->
+<!--								<small class="text-muted">Maximum file size allowed is 2048 KB.</small>-->
+<!--								<div class="custom-file">-->
+<!--									<input type="file" class="custom-file-input" id="file-input">-->
+<!--									<label class="custom-file-label nott ls0 mb-0 font-weight-normal" for="file-input">Choose file</label>-->
+<!--								</div>-->
+<!--							</div>-->
+							<div class="clear"></div>
+							<div class="col-12">
+								<button type="submit" name="submit" class="button button-large bg-alt py-2 rounded-sm font-weight-medium nott ls0 ml-0">Invia</button>
+							</div>
+						</form>
+					</div>
+
+				</div>
+
+			</div>
+		</section><!-- #content end -->
+
+		<!-- footer thymeleaf fragment -->
+		<div th:insert="footer :: footer"></div>
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="icon-angle-up"></div>
+
+	<script th:replace="sseclient :: sseclient"></script>
+	<script th:replace="assets :: assets"></script>
+
+	<script>
+		jQuery(document).ready( function(){
+
+            $('input[type="file"]').change(function(e){
+		        var fileName = e.target.files[0].name;
+		        $('.custom-file-label').html(fileName);
+		    });
+
+		});
+
+		function showEditPost(id) {
+			var x = document.getElementById("editpost"+id);
+			if (x.style.display === "none") {
+				x.style.display = "block";
+			} else {
+				x.style.display = "none";
+			}
+		}
+
+		function showEditTopic(id) {
+			var x = document.getElementById("edittopic"+id);
+			if (x.style.display === "none") {
+				x.style.display = "block";
+			} else {
+				x.style.display = "none";
+			}
+		}
+
+		function addQuote(id) {
+			var x = document.getElementById("postmessage"+id);
+			tinymce.get('messageReply').getBody().innerHTML = '<blockquote>' + x.innerHTML + '</blockquote>' + '<br>';
+		}
+
+		function addQuoteTopic() {
+			var x = document.getElementById("topicmessage");
+			tinymce.get('messageReply').getBody().innerHTML = '<blockquote>' + x.innerHTML + '</blockquote>' + '<br>';
+		}
+
+
+	</script>
+
+</body>
+</html>

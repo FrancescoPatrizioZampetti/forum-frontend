@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    </head>
+    <body>
+        <div th:fragment="footer">
+            <!-- Footer
+    ============================================= -->
+            <footer id="footer" class="dark" style="background-color: #101010;">
+                <div class="container">
+
+                    <!-- Footer Widgets
+                    ============================================= -->
+                    <div class="footer-widgets-wrap">
+
+                        <div class="row justify-content-center">
+                            <div class="col-lg-9">
+                                <div class="widget clearfix">
+
+                                    <div class="row col-mb-30">
+                                        <div class="col-lg-3 col-6 widget_links">
+                                            <ul>
+                                                <li><a href="forum">Home</a></li>
+                                                <li><a href="/search">Cerca</a></li>
+                                                <li><a href="login">Log In</a></li>
+                                                <li><a href="https://blackphoenixproductions.com">Black Phoenix Productions</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 mt-5 mt-lg-0 text-center text-lg-right">
+                                <div class="widget clearfix">
+
+                                    <div class="row">
+
+                                        <div class="col-12 d-flex justify-content-center justify-content-lg-end">
+                                            <a href="https://www.facebook.com/Black-Phoenix-Productions-108076771364801/" class="social-icon si-small si-light si-facebook">
+                                                <i class="icon-facebook"></i>
+                                                <i class="icon-facebook"></i>
+                                            </a>
+                                            <a href="https://twitter.com/blackphoenixpr1" class="social-icon si-small si-light si-twitter">
+                                                <i class="icon-twitter"></i>
+                                                <i class="icon-twitter"></i>
+                                            </a>
+                                            <a href="https://www.instagram.com/black_phoenix_productions/" class="social-icon si-small si-light si-instagram">
+                                                <i class="icon-instagram"></i>
+                                                <i class="icon-instagram"></i>
+                                            </a>
+<!--                                            <a href="#" class="social-icon si-small si-light si-paypal">-->
+<!--                                                <i class="icon-paypal"></i>-->
+<!--                                                <i class="icon-paypal"></i>-->
+<!--                                            </a>-->
+
+                                        </div>
+
+                                        <div class="col-12 mt-5 text-white-50 text-smaller">
+                                            All Rights Reserved <br>&copy; 2021 by Black Phoenix Productions<br>
+                                        </div>
+                                        <div class="col-12 mt-5 text-white-50 text-smaller">
+                                            Version <br>
+                                            front-end: <span th:text="${buildVersionFE}"></span><br>
+                                            back-end: <span th:text="${buildVersionBE}"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- .footer-widgets-wrap end -->
+                </div>
+            </footer><!-- #footer end -->
+
+        </div>
+    </body>
+
+</html>
