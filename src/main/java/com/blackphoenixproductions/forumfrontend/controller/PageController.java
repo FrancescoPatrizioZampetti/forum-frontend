@@ -1,9 +1,7 @@
 package com.blackphoenixproductions.forumfrontend.controller;
 
-import com.blackphoenixproductions.forumfrontend.dto.NotificationDTO;
+import com.blackphoenixproductions.forumfrontend.client.ForumClient;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
-import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
 import com.blackphoenixproductions.forumfrontend.utility.CookieUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValueUtility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +14,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 
 @Controller
 public class PageController {
 
     private final ValueUtility valueUtility;
+    private final ForumClient forumClient;
 
     @Autowired
-    public PageController(ValueUtility valueUtility) {
+    public PageController(ValueUtility valueUtility, ForumClient forumClient) {
         this.valueUtility = valueUtility;
+        this.forumClient = forumClient;
     }
 
     @GetMapping (value = "/search")
     public String searchPage (Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page, @RequestParam(required = false) String title,  @RequestParam(required = false) String username) throws Exception {
 //        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
+//        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
         if(page == null){
 //            pagedTopics = backendCaller.getTopicsByPage(0L, Pagination.TOPIC_PAGINATION.getValue(), title, username);
         } else{
 //            pagedTopics = backendCaller.getTopicsByPage(page, Pagination.TOPIC_PAGINATION.getValue(), title, username);
         }
-        setCommonAttributes(model, jwtToken);
+        setCommonAttributes(model, null);
         model.addAttribute("title", title);
         model.addAttribute("author", username);
 //        model.addAttribute("pagedTopics", pagedTopics);
@@ -56,7 +55,7 @@ public class PageController {
     public String forumPage(Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page) throws Exception {
 //        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
         String jwtToken = null; // todo recuperare da request
-//        Long totalUsers = backendCaller.getTotalUsers();
+        Integer totalUsers = (Integer) forumClient.getTotalUsers().getBody().getContent().getValue();
 //        Long totalTopics = backendCaller.getTotalTopics();
 //        Long totalPosts = backendCaller.getTotalPosts();
         if(page == null) {
