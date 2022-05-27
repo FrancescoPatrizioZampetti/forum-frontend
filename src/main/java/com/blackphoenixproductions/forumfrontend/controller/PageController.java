@@ -24,28 +24,10 @@ public class PageController {
 
     private final ValueUtility valueUtility;
 
-
-
     @Autowired
     public PageController(ValueUtility valueUtility) {
         this.valueUtility = valueUtility;
     }
-
-
-    @GetMapping(value = "/login")
-    public String loginPage(Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        setCommonAttributes(model, jwtToken);
-        return "forum-login";
-    }
-
-    @GetMapping (value = "/signin")
-    public String signinPage (Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        setCommonAttributes(model, jwtToken);
-        return "forum-signin";
-    }
-
 
     @GetMapping (value = "/search")
     public String searchPage (Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page, @RequestParam(required = false) String title,  @RequestParam(required = false) String username) throws Exception {
@@ -73,7 +55,7 @@ public class PageController {
     @GetMapping (value = {"/forum", "/"})
     public String forumPage(Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page) throws Exception {
 //        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
+        String jwtToken = null; // todo recuperare da request
 //        Long totalUsers = backendCaller.getTotalUsers();
 //        Long totalTopics = backendCaller.getTotalTopics();
 //        Long totalPosts = backendCaller.getTotalPosts();

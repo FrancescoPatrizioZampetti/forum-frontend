@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -28,8 +29,16 @@ public class UserController {
 
     @GetMapping (value = "/logout")
     public String logout(HttpServletResponse httpServletResponse){
-        CookieUtility.deleteCookie(httpServletResponse, valueUtility.isSecureCookie(), CookieUtility.ACCESS_TOKEN_NAME);
-        CookieUtility.deleteCookie(httpServletResponse, valueUtility.isSecureCookie(), CookieUtility.REFRESH_TOKEN_NAME);
+        logger.info("Start logout");
+        // todo chiamare api keycloak
+        logger.info("Start logout");
+        return "redirect:/forum";
+    }
+
+    @GetMapping (value = "/login")
+    public String login(HttpServletRequest request, HttpServletResponse httpServletResponse){
+        logger.info("Start login");
+        logger.info("End login");
         return "redirect:/forum";
     }
 
