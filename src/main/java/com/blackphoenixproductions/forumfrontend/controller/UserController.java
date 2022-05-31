@@ -1,7 +1,6 @@
 package com.blackphoenixproductions.forumfrontend.controller;
 
 
-import com.blackphoenixproductions.forumfrontend.utility.CookieUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValueUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

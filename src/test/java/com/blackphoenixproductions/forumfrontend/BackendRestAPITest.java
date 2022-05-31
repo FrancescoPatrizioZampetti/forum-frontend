@@ -1,6 +1,5 @@
 package com.blackphoenixproductions.forumfrontend;
 
-import com.blackphoenixproductions.forumfrontend.dto.KeyValueDTO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +24,7 @@ public class BackendRestAPITest {
 
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<EntityModel<KeyValueDTO>> response = restTemplate.exchange(BACKEND_PATH + "/api/getTotalUsers", HttpMethod.GET, requestEntity, new ParameterizedTypeReference<EntityModel<KeyValueDTO>>(){});
+        ResponseEntity<EntityModel<Long>> response = restTemplate.exchange(BACKEND_PATH + "/api/getTotalUsers", HttpMethod.GET, requestEntity, new ParameterizedTypeReference<EntityModel<Long>>(){});
         Links links = response.getBody().getLinks();
 
     }

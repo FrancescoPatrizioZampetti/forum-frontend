@@ -2,16 +2,16 @@ package com.blackphoenixproductions.forumfrontend.enums;
 
 public enum Pagination {
 
-    TOPIC_PAGINATION (3L),
-    POST_PAGINATION (10L);
+    TOPIC_PAGINATION (3),
+    POST_PAGINATION (10);
 
-    private final Long value;
+    private final int value;
 
-    Pagination(Long value) {
+    Pagination(int value) {
         this.value = value;
     }
 
-    public Long getValue() {
+    public int getValue() {
         return value;
     }
 }
