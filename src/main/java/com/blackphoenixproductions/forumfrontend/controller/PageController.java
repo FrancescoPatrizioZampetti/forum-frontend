@@ -2,6 +2,7 @@ package com.blackphoenixproductions.forumfrontend.controller;
 
 import com.blackphoenixproductions.forumfrontend.client.ForumClient;
 import com.blackphoenixproductions.forumfrontend.dto.Filter;
+import com.blackphoenixproductions.forumfrontend.dto.NotificationDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.VTopicDTO;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.List;
 
 
 @Controller
@@ -96,35 +98,37 @@ public class PageController {
     }
 
     @GetMapping (value="/notification")
-    public String notification(Model model, HttpServletRequest httpServletRequest) {
-//        List<NotificationDTO> notificationDTOList = backendCaller.getUserNotificationList(jwtToken);
-//        model.addAttribute("notificationList", notificationDTOList);
+    public String notification(Model model, HttpServletRequest httpServletRequest, Principal principal) {
+        List<NotificationDTO> notificationDTOList = (List<NotificationDTO>) forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+        model.addAttribute("notificationList", notificationDTOList);
         model.addAttribute("domain", valueUtility.getDomain());
         return "notification :: notification_fragment";
     }
 
     @GetMapping (value="/readedNotification")
     public @ResponseBody
-    void readedNotification (HttpServletRequest httpServletRequest){
-//        backendCaller.setReadedNotificationStatus(jwtToken);
+    void readedNotification (HttpServletRequest httpServletRequest, Principal principal){
+        forumClient.setReadedNotificationStatus(KeycloakUtility.getBearerTokenString(principal));
     }
 
 
     private void setCommonAttributes (Model model, Principal principal) throws Exception {
         SimpleUserDTO simpleUserDTO = null;
+        List<NotificationDTO> notificationDTOList = null;
+        Boolean userNotificationStatus = null;
         if(principal != null) {
-            simpleUserDTO = forumClient.retriveUser(KeycloakUtility.getAccessTokenString(principal)).getBody().getContent();
-            //        List<NotificationDTO> notificationDTOList = backendCaller.getUserNotificationList(jwtToken);
-            //        Boolean userNotificationStatus = backendCaller.getUserNotificationStatus(jwtToken);
-            //        model.addAttribute("token", jwtToken);
+            simpleUserDTO = forumClient.retriveUser(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
+            notificationDTOList = (List<NotificationDTO>) forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+            userNotificationStatus = forumClient.getUserNotificationStatus(KeycloakUtility.getBearerTokenString(principal)).getBody();
+            model.addAttribute("token", KeycloakUtility.getAccessTokenString(principal));
         }
-//        String buildVersionBE = backendCaller.getBuildVersionBackEnd();
+        String buildVersionBE = forumClient.getBuildVersionBackEnd().getBody();
         model.addAttribute("user", simpleUserDTO);
-//        model.addAttribute("domain", valueUtility.getDomain());
-//        model.addAttribute("sseBackend", valueUtility.getSseBackend());
-//        model.addAttribute("notificationList", notificationDTOList);
-//        model.addAttribute("userNotificationStatus", userNotificationStatus);
-//        model.addAttribute("buildVersionBE", buildVersionBE);
+        model.addAttribute("domain", valueUtility.getDomain());
+        model.addAttribute("sseBackend", valueUtility.getSseBackend());
+        model.addAttribute("notificationList", notificationDTOList);
+        model.addAttribute("userNotificationStatus", userNotificationStatus);
+        model.addAttribute("buildVersionBE", buildVersionBE);
         model.addAttribute("buildVersionFE", valueUtility.getBuildVersion());
     }
 
