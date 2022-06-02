@@ -5,7 +5,9 @@ import com.blackphoenixproductions.forumfrontend.dto.Filter;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.VTopicDTO;
+import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
 import com.blackphoenixproductions.forumfrontend.enums.Pagination;
+import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValueUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 
 @Controller
@@ -34,7 +37,7 @@ public class PageController {
     }
 
     @GetMapping (value = "/search")
-    public String searchPage (Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page, @RequestParam(required = false) String title,  @RequestParam(required = false) String username) throws Exception {
+    public String searchPage (Model model, HttpServletRequest req, @RequestParam(required = false) Long page, @RequestParam(required = false) String title,  @RequestParam(required = false) String username) throws Exception {
 //        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
 //        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
         if(page == null){
@@ -50,13 +53,13 @@ public class PageController {
     }
 
     @GetMapping(value = "/profile")
-    public String profilePage(Model model, HttpServletRequest httpServletRequest) throws Exception {
+    public String profilePage(Model model, HttpServletRequest req) throws Exception {
         setCommonAttributes(model, null);
         return "forum-profile";
     }
 
     @GetMapping (value = {"/forum", "/"})
-    public String forumPage(Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page) throws Exception {
+    public String forumPage(Model model, HttpServletRequest req, Principal principal, @RequestParam(required = false) Long page) throws Exception {
         Integer totalUsers = forumClient.getTotalUsers().getBody().intValue();
         Integer totalTopics = forumClient.getTotalTopics().getBody().intValue();
         Integer totalPosts =  forumClient.getTotalPosts().getBody().intValue();
@@ -67,8 +70,7 @@ public class PageController {
             pagedTopics = forumClient.findFilteredTopicsByPage(0, Pagination.TOPIC_PAGINATION.getValue(), Filter.builder().build()).getBody();
         }
         pagedTopics.getMetadata().getTotalPages();
-        // TODO postsnumber stava dentro al dto prima, nuova chiamata o fecciare anche i post del topic oppure aggiungere campo vista
-        setCommonAttributes(model, null);
+        setCommonAttributes(model, principal);
         model.addAttribute("totalusers", totalUsers);
         model.addAttribute("totaltopics", totalTopics);
         model.addAttribute("totalposts", totalPosts);
@@ -78,7 +80,7 @@ public class PageController {
 
 
     @GetMapping (value="/viewtopic")
-    public String viewTopic(Model model, HttpServletRequest httpServletRequest, @RequestParam Long id, @RequestParam(required = false) Long page) throws Exception {
+    public String viewTopic(Model model, HttpServletRequest req, @RequestParam Long id, @RequestParam(required = false) Long page) throws Exception {
         PagedModel<EntityModel<PostDTO>> postPageDTO = null;
 //        TopicDTO topicDTO = backendCaller.findTopic(id);
         if(page == null) {
@@ -108,13 +110,16 @@ public class PageController {
     }
 
 
-    private void setCommonAttributes (Model model, String jwtToken) throws Exception {
-//        SimpleUserDTO simpleUserDTO = backendCaller.getLoggedUser(jwtToken);
-//        List<NotificationDTO> notificationDTOList = backendCaller.getUserNotificationList(jwtToken);
+    private void setCommonAttributes (Model model, Principal principal) throws Exception {
+        SimpleUserDTO simpleUserDTO = null;
+        if(principal != null) {
+            simpleUserDTO = forumClient.retriveUser(KeycloakUtility.getAccessTokenString(principal)).getBody().getContent();
+            //        List<NotificationDTO> notificationDTOList = backendCaller.getUserNotificationList(jwtToken);
+            //        Boolean userNotificationStatus = backendCaller.getUserNotificationStatus(jwtToken);
+            //        model.addAttribute("token", jwtToken);
+        }
 //        String buildVersionBE = backendCaller.getBuildVersionBackEnd();
-//        Boolean userNotificationStatus = backendCaller.getUserNotificationStatus(jwtToken);
-//        model.addAttribute("user", simpleUserDTO);
-//        model.addAttribute("token", jwtToken);
+        model.addAttribute("user", simpleUserDTO);
 //        model.addAttribute("domain", valueUtility.getDomain());
 //        model.addAttribute("sseBackend", valueUtility.getSseBackend());
 //        model.addAttribute("notificationList", notificationDTOList);

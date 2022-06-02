@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 
 
 @Controller
@@ -27,7 +28,7 @@ public class UserController {
 
 
     @GetMapping (value = "/logout")
-    public String logout(HttpServletResponse httpServletResponse){
+    public String logout(HttpServletRequest req, HttpServletResponse httpServletResponse){
         logger.info("Start logout");
         // todo chiamare api keycloak
         logger.info("Start logout");
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping (value = "/login")
-    public String login(HttpServletRequest request, HttpServletResponse httpServletResponse){
+    public String login(HttpServletRequest req, HttpServletResponse httpServletResponse, Principal principal){
         logger.info("Start login");
         logger.info("End login");
         return "redirect:/forum";
