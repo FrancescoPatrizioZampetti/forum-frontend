@@ -6,7 +6,7 @@ import com.blackphoenixproductions.forumfrontend.dto.NotificationDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.VTopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
+import com.blackphoenixproductions.forumfrontend.dto.user.UserDTO;
 import com.blackphoenixproductions.forumfrontend.enums.Pagination;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
 import com.blackphoenixproductions.forumfrontend.utility.FilterUtility;
@@ -122,17 +122,17 @@ public class PageController {
 
 
     private void setCommonAttributes (Model model, Principal principal) throws Exception {
-        SimpleUserDTO simpleUserDTO = null;
+        UserDTO userDTO = null;
         List<NotificationDTO> notificationDTOList = null;
         Boolean userNotificationStatus = null;
         if(principal != null) {
-            simpleUserDTO = forumClient.retriveUser(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
+            userDTO = forumClient.retriveUser(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
             notificationDTOList = (List<NotificationDTO>) forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
             userNotificationStatus = forumClient.getUserNotificationStatus(KeycloakUtility.getBearerTokenString(principal)).getBody();
             model.addAttribute("token", KeycloakUtility.getAccessTokenString(principal));
         }
         String buildVersionBE = forumClient.getBuildVersionBackEnd().getBody();
-        model.addAttribute("user", simpleUserDTO);
+        model.addAttribute("user", userDTO);
         model.addAttribute("domain", valueUtility.getDomain());
         model.addAttribute("sseBackend", valueUtility.getSseBackend());
         model.addAttribute("notificationList", notificationDTOList);

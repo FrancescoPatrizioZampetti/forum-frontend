@@ -3,7 +3,6 @@ package com.blackphoenixproductions.forumfrontend.controller;
 
 import com.blackphoenixproductions.forumfrontend.dto.topic.EditTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.InsertTopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
 import com.blackphoenixproductions.forumfrontend.utility.ValidationUtility;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;

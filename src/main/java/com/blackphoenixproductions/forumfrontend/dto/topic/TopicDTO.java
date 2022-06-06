@@ -20,4 +20,5 @@ public class TopicDTO {
     private LocalDateTime createDate;
     private LocalDateTime deleteDate;
     private LocalDateTime editDate;
+
 }

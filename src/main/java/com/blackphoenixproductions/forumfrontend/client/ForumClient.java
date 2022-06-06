@@ -8,7 +8,7 @@ import com.blackphoenixproductions.forumfrontend.dto.topic.EditTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.InsertTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.VTopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
+import com.blackphoenixproductions.forumfrontend.dto.user.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -50,10 +50,10 @@ public interface ForumClient {
     ResponseEntity<EntityModel<TopicDTO>> editTopic(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestBody EditTopicDTO topicDTO);
 
     @GetMapping (value = "/retriveUser")
-    ResponseEntity<EntityModel<SimpleUserDTO>> retriveUser(@RequestHeader(AUTH_TOKEN) String bearerToken);
+    ResponseEntity<EntityModel<UserDTO>> retriveUser(@RequestHeader(AUTH_TOKEN) String bearerToken);
 
     @PostMapping (value = "/changeUserUsername")
-    ResponseEntity<EntityModel<SimpleUserDTO>> changeUserUsername(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestParam String newUsername);
+    ResponseEntity<EntityModel<UserDTO>> changeUserUsername(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestParam String newUsername);
 
     @GetMapping(value = "/getBuildVersionBackEnd")
     ResponseEntity<String> getBuildVersionBackEnd();
