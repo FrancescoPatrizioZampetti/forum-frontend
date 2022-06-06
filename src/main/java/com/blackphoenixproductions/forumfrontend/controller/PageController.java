@@ -9,10 +9,9 @@ import com.blackphoenixproductions.forumfrontend.dto.topic.VTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
 import com.blackphoenixproductions.forumfrontend.enums.Pagination;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
+import com.blackphoenixproductions.forumfrontend.utility.FilterUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValueUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Controller;
@@ -23,7 +22,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -39,20 +40,28 @@ public class PageController {
     }
 
     @GetMapping (value = "/search")
-    public String searchPage (Model model, HttpServletRequest req, @RequestParam(required = false) Long page, @RequestParam(required = false) String title,  @RequestParam(required = false) String username) throws Exception {
-//        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
-//        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        if(page == null){
-//            pagedTopics = backendCaller.getTopicsByPage(0L, Pagination.TOPIC_PAGINATION.getValue(), title, username);
+    public String searchPage (Model model,
+                              HttpServletRequest req,
+                              @RequestParam(required = false) Long page,
+                              @RequestParam(required = false) String title)
+                              throws Exception {
+        PagedModel<EntityModel<VTopicDTO>> pagedTopics = null;
+
+        Map<String, String> paramsMap = new HashMap();
+        paramsMap.put("title", title);
+        Filter filter = FilterUtility.buildFilter(paramsMap);
+
+        if(page != null){
+            pagedTopics = forumClient.findFilteredTopicsByPage(page.intValue(), Pagination.TOPIC_PAGINATION.getValue(), filter).getBody();
         } else{
-//            pagedTopics = backendCaller.getTopicsByPage(page, Pagination.TOPIC_PAGINATION.getValue(), title, username);
+            pagedTopics = forumClient.findFilteredTopicsByPage(0, Pagination.TOPIC_PAGINATION.getValue(), filter).getBody();
         }
         setCommonAttributes(model, null);
         model.addAttribute("title", title);
-        model.addAttribute("author", username);
-//        model.addAttribute("pagedTopics", pagedTopics);
+        model.addAttribute("pagedTopics", pagedTopics);
         return "forum-search";
     }
+
 
     @GetMapping(value = "/profile")
     public String profilePage(Model model, HttpServletRequest req) throws Exception {
@@ -82,18 +91,18 @@ public class PageController {
 
 
     @GetMapping (value="/viewtopic")
-    public String viewTopic(Model model, HttpServletRequest req, @RequestParam Long id, @RequestParam(required = false) Long page) throws Exception {
+    public String viewTopic(Model model, HttpServletRequest req, @RequestParam Long id, @RequestParam(required = false) Long page, Principal principal) throws Exception {
         PagedModel<EntityModel<PostDTO>> postPageDTO = null;
-//        TopicDTO topicDTO = backendCaller.findTopic(id);
-        if(page == null) {
-//            postPageDTO = backendCaller.getPostsByPage(id, 0L, Pagination.POST_PAGINATION.getValue());
+        TopicDTO topicDTO = forumClient.findTopic(id).getBody().getContent();
+        if(page != null) {
+            postPageDTO = forumClient.findPostsByPage(id, page.intValue(), Pagination.POST_PAGINATION.getValue()).getBody();
         }
         else {
-//            postPageDTO = backendCaller.getPostsByPage(id, page, Pagination.POST_PAGINATION.getValue());
+            postPageDTO = forumClient.findPostsByPage(id, 0, Pagination.POST_PAGINATION.getValue()).getBody();
         }
-//        model.addAttribute("topic", topicDTO);
+        model.addAttribute("topic", topicDTO);
         model.addAttribute("pagedPosts", postPageDTO);
-        setCommonAttributes(model, null);
+        setCommonAttributes(model, principal);
         return "forum-single";
     }
 

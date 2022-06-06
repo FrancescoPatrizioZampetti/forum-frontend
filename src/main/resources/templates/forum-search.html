@@ -64,7 +64,7 @@
 											<div class="entry-meta mt-1">
 												<ul>
 													<li th:text="${topic.content.timeDifferenceFromNow}"></li>
-													<li th:text="${pagedTopics.metadata.totalpages} + ' Risposte' "></li>
+													<li th:text="${pagedTopics.metadata.totalPages} + ' Risposte' "></li>
 												</ul>
 											</div>
 										</li>
@@ -78,21 +78,21 @@
 									<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
 								</div>
 								<div th:if="${pagedTopics.metadata.number != 0}">
-									<li class="page-item"><a class="page-link" th:href="${'search?page=' + (pagedTopics.metadata.number -1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
+									<li class="page-item"><a class="page-link" th:href="${'search?page=' + (pagedTopics.metadata.number -1) + (title != null ? '&title=' + title : '') }" tabindex="-1" aria-disabled="true"> <span class="op-05" aria-hidden="true">&laquo;</span></a></li>
 								</div>
 								<ul class="pagination justify-content-end"  th:each="i: ${#numbers.sequence(1, pagedTopics.metadata.totalPages)}">
 									<div th:if="${pagedTopics.metadata.totalPages != 0}">
 										<div th:if="${pagedTopics.metadata.number == (i-1)}">
-											<li class="page-item active"><a class="page-link" th:href="${'search?page=' + (i-1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" th:text="${i}"></a></li>
+											<li class="page-item active"><a class="page-link" th:href="${'search?page=' + (i-1) + (title != null ? '&title=' + title : '') }" th:text="${i}"></a></li>
 										</div>
 										<div th:if="${pagedTopics.metadata.number != (i-1)}">
-											<li class="page-item"><a class="page-link" th:href="${'search?page=' + (i-1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" th:text="${i}"></a></li>
+											<li class="page-item"><a class="page-link" th:href="${'search?page=' + (i-1) + (title != null ? '&title=' + title : '') }" th:text="${i}"></a></li>
 										</div>
 									</div>
 								</ul>
 								<div th:if="${pagedTopics.metadata.totalPages == 0}">
 									<ul class="pagination justify-content-end">
-										<li class="page-item active"><a class="page-link" th:href="${'search?page=0' + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" th:text="${1}" ></a></li>
+										<li class="page-item active"><a class="page-link" th:href="${'search?page=0' + (title != null ? '&title=' + title : '') }" th:text="${1}" ></a></li>
 									</ul>
 								</div>
 
@@ -100,7 +100,7 @@
 									<li class="page-item disabled"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
 								</div>
 								<div th:if="${( (pagedTopics.metadata.number + 1) != pagedTopics.metadata.totalPages ) && pagedTopics.metadata.totalPages != 0}">
-									<li class="page-item"><a class="page-link" th:href="${'search?page=' + (pagedTopics.metadata.number +1) + (title != null ? '&title=' + title : '') + (author != null ? '&username=' + author : '') }" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+									<li class="page-item"><a class="page-link" th:href="${'search?page=' + (pagedTopics.metadata.number +1) + (title != null ? '&title=' + title : '') }" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
 								</div>
 							</ul>
 						</div>
