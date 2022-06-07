@@ -17,8 +17,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 
 @FeignClient(value = "forum-client", path = "/api", url = "${backend.path}")
 public interface ForumClient {
