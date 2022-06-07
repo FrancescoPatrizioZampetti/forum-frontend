@@ -12,8 +12,7 @@ public class MyErrorController implements ErrorController {
 
 
     @GetMapping(value="/error")
-    public String genericError(HttpServletRequest httpServletRequest, RedirectAttributes attributes){
-        attributes.addFlashAttribute("generic_error",true);
+    public String genericError(HttpServletRequest httpServletRequest){
         return "redirect:/login";
     }
 
