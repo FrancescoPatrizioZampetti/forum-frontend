@@ -11,7 +11,10 @@ import com.blackphoenixproductions.forumfrontend.enums.Pagination;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
 import com.blackphoenixproductions.forumfrontend.utility.FilterUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValueUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Controller;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,8 @@ import java.util.Map;
 
 @Controller
 public class PageController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PageController.class);
 
     private final ValueUtility valueUtility;
     private final ForumClient forumClient;
@@ -122,7 +128,10 @@ public class PageController {
     public String notification(Model model,
                                HttpServletRequest httpServletRequest,
                                Principal principal) {
-        List<NotificationDTO> notificationDTOList = (List<NotificationDTO>) forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+        CollectionModel<NotificationDTO> notificationDTOList = null;
+        if(principal != null){
+            notificationDTOList = forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+        }
         model.addAttribute("notificationList", notificationDTOList);
         model.addAttribute("domain", valueUtility.getDomain());
         return "notification :: notification_fragment";
@@ -132,17 +141,22 @@ public class PageController {
     public @ResponseBody
     void readedNotification (HttpServletRequest httpServletRequest,
                              Principal principal){
-        forumClient.setReadedNotificationStatus(KeycloakUtility.getBearerTokenString(principal));
+        if(principal != null) {
+            forumClient.setReadedNotificationStatus(KeycloakUtility.getBearerTokenString(principal));
+        }
     }
 
 
     private void setCommonAttributes (Model model, Principal principal) throws Exception {
         UserDTO userDTO = null;
-        List<NotificationDTO> notificationDTOList = null;
+        Collection<NotificationDTO> notificationDTOList = null;
         Boolean userNotificationStatus = null;
         if(principal != null) {
             userDTO = forumClient.retriveUser(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
-            notificationDTOList = (List<NotificationDTO>) forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+            CollectionModel<NotificationDTO> notifications = forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+            if(notifications != null){
+                notificationDTOList =  forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
+            }
             userNotificationStatus = forumClient.getUserNotificationStatus(KeycloakUtility.getBearerTokenString(principal)).getBody();
             model.addAttribute("token", KeycloakUtility.getAccessTokenString(principal));
         }
