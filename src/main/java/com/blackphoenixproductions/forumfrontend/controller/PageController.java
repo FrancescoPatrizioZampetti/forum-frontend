@@ -69,6 +69,7 @@ public class PageController {
     public String profilePage(Model model,
                               Principal principal,
                               HttpServletRequest req) throws Exception {
+        model.addAttribute("roles", KeycloakUtility.getRoles(req));
         setCommonAttributes(model, principal);
         return "forum-profile";
     }
