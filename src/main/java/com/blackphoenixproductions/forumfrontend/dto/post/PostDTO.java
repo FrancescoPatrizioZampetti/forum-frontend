@@ -1,5 +1,6 @@
 package com.blackphoenixproductions.forumfrontend.dto.post;
 
+import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.user.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class PostDTO {
     private LocalDateTime deleteDate;
     private LocalDateTime editDate;
     private UserDTO user;
+    private TopicDTO topic;
     private String formattedCreateDate;
     private String formattedEditDate;
 

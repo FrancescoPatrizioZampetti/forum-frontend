@@ -41,7 +41,8 @@ public class PageController {
 
     @GetMapping (value = "/search")
     public String searchPage (Model model,
-                              HttpServletRequest req,
+                              HttpServletRequest req, Principal principal,
+                              @RequestParam(required = false) String authorUsername,
                               @RequestParam(required = false) Long page,
                               @RequestParam(required = false) String title)
                               throws Exception {
@@ -49,6 +50,7 @@ public class PageController {
 
         Map<String, String> paramsMap = new HashMap();
         paramsMap.put("title", title);
+        paramsMap.put("authorUsername", authorUsername);
         Filter filter = FilterUtility.buildFilter(paramsMap);
 
         if(page != null){
@@ -56,7 +58,7 @@ public class PageController {
         } else{
             pagedTopics = forumClient.findFilteredTopicsByPage(0, Pagination.TOPIC_PAGINATION.getValue(), filter).getBody();
         }
-        setCommonAttributes(model, null);
+        setCommonAttributes(model, principal);
         model.addAttribute("title", title);
         model.addAttribute("pagedTopics", pagedTopics);
         return "forum-search";
@@ -64,13 +66,18 @@ public class PageController {
 
 
     @GetMapping(value = "/profile")
-    public String profilePage(Model model, HttpServletRequest req) throws Exception {
-        setCommonAttributes(model, null);
+    public String profilePage(Model model,
+                              Principal principal,
+                              HttpServletRequest req) throws Exception {
+        setCommonAttributes(model, principal);
         return "forum-profile";
     }
 
     @GetMapping (value = {"/forum", "/"})
-    public String forumPage(Model model, HttpServletRequest req, Principal principal, @RequestParam(required = false) Long page) throws Exception {
+    public String forumPage(Model model,
+                            HttpServletRequest req,
+                            Principal principal,
+                            @RequestParam(required = false) Long page) throws Exception {
         Integer totalUsers = forumClient.getTotalUsers().getBody().intValue();
         Integer totalTopics = forumClient.getTotalTopics().getBody().intValue();
         Integer totalPosts =  forumClient.getTotalPosts().getBody().intValue();
@@ -91,7 +98,11 @@ public class PageController {
 
 
     @GetMapping (value="/viewtopic")
-    public String viewTopic(Model model, HttpServletRequest req, @RequestParam Long id, @RequestParam(required = false) Long page, Principal principal) throws Exception {
+    public String viewTopic(Model model,
+                            HttpServletRequest req,
+                            @RequestParam Long id,
+                            @RequestParam(required = false) Long page,
+                            Principal principal) throws Exception {
         PagedModel<EntityModel<PostDTO>> postPageDTO = null;
         TopicDTO topicDTO = forumClient.findTopic(id).getBody().getContent();
         if(page != null) {
@@ -107,7 +118,9 @@ public class PageController {
     }
 
     @GetMapping (value="/notification")
-    public String notification(Model model, HttpServletRequest httpServletRequest, Principal principal) {
+    public String notification(Model model,
+                               HttpServletRequest httpServletRequest,
+                               Principal principal) {
         List<NotificationDTO> notificationDTOList = (List<NotificationDTO>) forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
         model.addAttribute("notificationList", notificationDTOList);
         model.addAttribute("domain", valueUtility.getDomain());
@@ -116,7 +129,8 @@ public class PageController {
 
     @GetMapping (value="/readedNotification")
     public @ResponseBody
-    void readedNotification (HttpServletRequest httpServletRequest, Principal principal){
+    void readedNotification (HttpServletRequest httpServletRequest,
+                             Principal principal){
         forumClient.setReadedNotificationStatus(KeycloakUtility.getBearerTokenString(principal));
     }
 

@@ -14,6 +14,7 @@ public class FilterUtility {
             if(paramsMap.get(key) != null) {
                 switch (key) {
                     case "title":
+                    case "authorUsername":
                         root.getFilters().add(buildSpecificFilter(QueryOperator.LIKE, key, paramsMap.get(key)));
                         break;
                 }

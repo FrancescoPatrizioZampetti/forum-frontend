@@ -2,6 +2,7 @@ package com.blackphoenixproductions.forumfrontend.client;
 
 import com.blackphoenixproductions.forumfrontend.dto.Filter;
 import com.blackphoenixproductions.forumfrontend.dto.NotificationDTO;
+import com.blackphoenixproductions.forumfrontend.dto.post.EditPostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.InsertPostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.EditTopicDTO;
@@ -15,6 +16,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @FeignClient(value = "forum-client", path = "/api", url = "${backend.path}")
@@ -39,6 +42,9 @@ public interface ForumClient {
 
     @PostMapping(value = "createPost")
     ResponseEntity<EntityModel<PostDTO>> createPost(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestBody InsertPostDTO postDTO);
+
+    @PostMapping(value = "editPost")
+    ResponseEntity<EntityModel<PostDTO>> editPost(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestBody EditPostDTO postDTO);
 
     @GetMapping(value = "/findTopic")
     ResponseEntity<EntityModel<TopicDTO>> findTopic(@RequestParam Long id);
