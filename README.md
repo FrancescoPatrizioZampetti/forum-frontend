@@ -13,7 +13,7 @@ A forum front-end created with Spring Boot.
 
 ## A Forum front-end created with Spring Boot. 
 The key features are:
-- Keycloak Authentication with both normal and social login (Google, Facebook, GitHub).
+- Keycloak authentication with both normal and social login (Google, Facebook, GitHub).
 - Feign client.
 - Thymeleaf template engine.
 - All the basic features of a forum: topic creation and search, post creation and email notifications.
