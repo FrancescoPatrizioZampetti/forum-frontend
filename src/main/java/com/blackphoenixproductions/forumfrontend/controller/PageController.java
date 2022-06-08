@@ -141,7 +141,7 @@ public class PageController {
     void readedNotification (HttpServletRequest httpServletRequest,
                              Principal principal){
         if(principal != null) {
-            forumClient.setReadedNotificationStatus(KeycloakUtility.getBearerTokenString(principal));
+            forumClient.setNotificationStatus(KeycloakUtility.getBearerTokenString(principal), false);
         }
     }
 

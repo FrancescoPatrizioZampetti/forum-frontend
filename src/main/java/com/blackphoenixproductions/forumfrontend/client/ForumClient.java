@@ -68,8 +68,8 @@ public interface ForumClient {
     @GetMapping(value = "getUserNotificationStatus")
     ResponseEntity<Boolean> getUserNotificationStatus(@RequestHeader(AUTH_TOKEN) String bearerToken);
 
-    @GetMapping(value = "setReadedNotificationStatus")
-    ResponseEntity<String> setReadedNotificationStatus(@RequestHeader(AUTH_TOKEN) String bearerToken);
+    @PostMapping(value = "setNotificationStatus")
+    ResponseEntity<String> setNotificationStatus(@RequestHeader(AUTH_TOKEN) String bearerToken, @RequestParam boolean showNotificationNotice);
 
 
 }
