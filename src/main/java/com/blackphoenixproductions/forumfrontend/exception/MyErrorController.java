@@ -14,14 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 public class MyErrorController implements ErrorController {
 
     private static final Logger logger = LoggerFactory.getLogger(MyErrorController.class);
-    private final String DEFAULT_ERROR_ATTRIBUTE = "org.springframework.boot.web.servlet.error.DefaultErrorAttributes.ERROR";
 
 
     @GetMapping(value = "/error")
     public String genericError(Model model, HttpServletRequest httpServletRequest) {
         Object status = httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        Object errorAttribute = httpServletRequest.getAttribute(DEFAULT_ERROR_ATTRIBUTE);
-        logger.error("Errore : {} , statusCode : {}", errorAttribute, status);
+        logger.error("Errore - statusCode : {}", status);
         model.addAttribute("status", status);
         return "error";
     }
