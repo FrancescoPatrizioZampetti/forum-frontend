@@ -2,42 +2,48 @@ package com.blackphoenixproductions.forumfrontend.controller;
 
 
 
+import com.blackphoenixproductions.forumfrontend.client.ForumClient;
 import com.blackphoenixproductions.forumfrontend.dto.post.EditPostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.InsertPostDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
+import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
+import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValidationUtility;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 
 @Controller
 public class PostController {
 
+    private final ForumClient forumClient;
 
     @Autowired
-    public PostController() {
+    public PostController(ForumClient forumClient) {
+        this.forumClient = forumClient;
     }
 
 
     @PostMapping(value = "/createPost")
-    public String createPost(@ModelAttribute InsertPostDTO postDTO, @RequestParam Long topicId, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
-//        String newAccessToken = tokenUtility.refreshToken(httpServletRequest, httpServletResponse);
-//        SimpleUserDTO simpleUserDTO = backendCaller.getLoggedUser(newAccessToken);
+    public String createPost(@ModelAttribute InsertPostDTO postDTO,
+                             @RequestParam Long topicId,
+                             Principal principal,
+                             HttpServletRequest httpServletRequest) throws Exception {
         String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
         if(ValidationUtility.isValidPostInput(postDTO.getMessage())){
             postDTO.setTopicId(topicId);
-//            PostDTO createdPost = backendCaller.createPost(postDTO, newAccessToken);
-//            PagedModel<EntityModel<PostDTO>> postPageDTO = backendCaller.getPostsByPage(topicId,0L,10L);
-//            return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages()-1);
-            return "";
+            PostDTO createdPost = forumClient.createPost(KeycloakUtility.getBearerTokenString(principal), postDTO).getBody().getContent();
+            PagedModel<EntityModel<PostDTO>> postPageDTO = forumClient.findPostsByPage(topicId,0,10).getBody();
+            return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages()-1);
         }
         else{
             return "redirect:/forum";
@@ -46,14 +52,17 @@ public class PostController {
 
 
     @PostMapping(value = "/editPost")
-    public String editPost(@ModelAttribute EditPostDTO postDTO, @RequestParam Long topicId, @RequestParam Long pageNumber, @RequestParam Long postId,
-                           HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
-//        String newAccessToken = tokenUtility.refreshToken(httpServletRequest, httpServletResponse);
+    public String editPost(@ModelAttribute EditPostDTO postDTO,
+                           @RequestParam Long topicId,
+                           @RequestParam Long pageNumber,
+                           @RequestParam Long postId,
+                           Principal principal,
+                           HttpServletRequest httpServletRequest) throws Exception {
         String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
         postDTO.setId(postId);
         if(ValidationUtility.isValidPostInput(postDTO.getMessage())){
-//            backendCaller.editPost(postDTO, newAccessToken);
+            forumClient.editPost(KeycloakUtility.getBearerTokenString(principal), postDTO);
         }
         return "redirect:/viewtopic?id=" + topicId + "&page=" + pageNumber;
     }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
 
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -40,17 +41,16 @@
 		<section id="content">
 			<div class="content-wrap">
 				<div class="container mw-md">
-
 					<!-- START messaggio topic -->
 					<div class="topic-post reply mt-5 p-4 p-md-5" id="risp1">
 						<div class="row no-gutters justify-content-between align-items-center border-top border-bottom py-3 mb-4 border-color">
 							<div class="col-9">
 								<div class="d-flex align-items-center">
-									<img src="demos/forum/images/user.png"  alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${topic.user.role != 'STAFF'}">
-									<img src="demos/forum/images/staff.png" alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${topic.user.role == 'STAFF'}">
+									<img src="demos/forum/images/user.png"  alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${topic.user.role == 'USER'}">
+									<img src="demos/forum/images/staff.png" alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${topic.user.role == 'STAFF' or topic.user.role == 'HELPDESK'}">
 									<div>
 										<span class="mb-0 h6 font-weight-semibold align-middle" th:text= "${topic.user.username}"></span>
-										<span class="badge badge-info text-white p-1 ml-1" th:if= "${topic.user.role == 'STAFF'}">Staff</span>
+										<span class="badge badge-info text-white p-1 ml-1" th:if= "${topic.user.role == 'STAFF' or topic.user.role == 'HELPDESK'}">Staff</span>
 										<br>
 										<small class="text-muted mb-0 font-weight-normal" th:text= "${topic.formattedDate}"></small>
 									</div>
@@ -60,7 +60,7 @@
 							<div class="col-auto">
 								<a href="#" id="editlink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-line-ellipsis icon-2x alt-color"></i></a>
 								<div th:if="${user != null}" class="dropdown-menu dropdown-menu-links rounded shadow-sm dropdown-menu-right py-0 m-0" aria-labelledby="editlink">
-									<a th:if="${user.role == 'STAFF'}" th:onclick="return showEditTopic([[${topic.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
+									<a sec:authorize="hasAnyRole('HELPDESK', 'STAFF')" th:onclick="return showEditTopic([[${topic.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
 									<a class="dropdown-item" href="#message-reply" th:onclick="return addQuoteTopic([[${topic.id}]]);" data-scrollto="#message-reply"><i class="icon-line-corner-up-left mr-2"></i>Reply</a>
 								</div>
 							</div>
@@ -105,11 +105,11 @@
 						<div class="row no-gutters justify-content-between align-items-center border-top border-bottom py-3 mb-4">
 							<div class="col-9">
 								<div class="d-flex align-items-center">
-									<img src="demos/forum/images/user.png"  alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${post.content.user.role != 'STAFF'}">
-									<img src="demos/forum/images/staff.png" alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${post.content.user.role == 'STAFF'}">
+									<img src="demos/forum/images/user.png"  alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${post.content.user.role == 'USER'}" >
+									<img src="demos/forum/images/staff.png" alt="Author" class="rounded-circle mr-2" width="50" height="50" th:if= "${post.content.user.role == 'STAFF' or post.content.user.role == 'HELPDESK'}">
 									<div>
 										<span class="mb-0 h6 font-weight-semibold align-middle" th:text= "${post.content.user.username}"></span>
-										<span class="badge badge-info text-white p-1 ml-1" th:if= "${post.content.user.role == 'STAFF'}">Staff</span>
+										<span class="badge badge-info text-white p-1 ml-1" th:if= "${post.content.user.role == 'STAFF' or post.content.user.role == 'HELPDESK'}">Staff</span>
 										<br>
 										<small class="text-muted mb-0 font-weight-normal" th:text= "${post.content.formattedCreateDate}"></small>
 									</div>
@@ -119,7 +119,12 @@
 							<div class="col-auto">
 								<a href="#" id="editlink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-line-ellipsis icon-2x alt-color"></i></a>
 								<div th:if="${user != null}" class="dropdown-menu dropdown-menu-links rounded shadow-sm dropdown-menu-right py-0 m-0" aria-labelledby="editlink2">
-									<a th:if="${user.username == post.content.user.username || user.role == 'STAFF'}" th:onclick="return showEditPost([[${post.content.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
+									<div sec:authorize="hasAnyRole('HELPDESK', 'STAFF')">
+										<a th:onclick="return showEditPost([[${post.content.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
+									</div>
+									<div sec:authorize="hasRole('USER')">
+										<a th:if="${user.username == post.content.user.username}" th:onclick="return showEditPost([[${post.content.id}]]);" class="dropdown-item rounded-top"><i class="icon-line-edit mr-2" ></i>Edit</a>
+									</div>
 									<a class="dropdown-item" href="#message-reply" th:onclick="return addQuote([[${post.content.id}]]);" data-scrollto="#message-reply"><i class="icon-line-corner-up-left mr-2"></i>Reply</a>
 								</div>
 							</div>
@@ -269,7 +274,9 @@
 		}
 
 
+
 	</script>
+
 
 </body>
 </html>

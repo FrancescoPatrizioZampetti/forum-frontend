@@ -1,12 +1,20 @@
 package com.blackphoenixproductions.forumfrontend.controller;
 
+import com.blackphoenixproductions.forumfrontend.client.ForumClient;
+import com.blackphoenixproductions.forumfrontend.dto.Filter;
 import com.blackphoenixproductions.forumfrontend.dto.NotificationDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.SimpleUserDTO;
-import com.blackphoenixproductions.forumfrontend.utility.CookieUtility;
+import com.blackphoenixproductions.forumfrontend.dto.topic.VTopicDTO;
+import com.blackphoenixproductions.forumfrontend.dto.user.UserDTO;
+import com.blackphoenixproductions.forumfrontend.enums.Pagination;
+import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
+import com.blackphoenixproductions.forumfrontend.utility.FilterUtility;
 import com.blackphoenixproductions.forumfrontend.utility.ValueUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Controller;
@@ -16,146 +24,148 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
 public class PageController {
 
+    private static final Logger logger = LoggerFactory.getLogger(PageController.class);
+
     private final ValueUtility valueUtility;
-
-
+    private final ForumClient forumClient;
 
     @Autowired
-    public PageController(ValueUtility valueUtility) {
+    public PageController(ValueUtility valueUtility, ForumClient forumClient) {
         this.valueUtility = valueUtility;
+        this.forumClient = forumClient;
     }
-
-
-    @GetMapping(value = "/login")
-    public String loginPage(Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        setCommonAttributes(model, jwtToken);
-        return "forum-login";
-    }
-
-    @GetMapping (value = "/signin")
-    public String signinPage (Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        setCommonAttributes(model, jwtToken);
-        return "forum-signin";
-    }
-
 
     @GetMapping (value = "/search")
-    public String searchPage (Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page, @RequestParam(required = false) String title,  @RequestParam(required = false) String username) throws Exception {
-//        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        if(page == null){
-//            pagedTopics = backendCaller.getTopicsByPage(0L, Pagination.TOPIC_PAGINATION.getValue(), title, username);
+    public String searchPage (Model model,
+                              HttpServletRequest req, Principal principal,
+                              @RequestParam(required = false) String authorUsername,
+                              @RequestParam(required = false) Long page,
+                              @RequestParam(required = false) String title)
+                              throws Exception {
+        PagedModel<EntityModel<VTopicDTO>> pagedTopics = null;
+
+        Map<String, String> paramsMap = new HashMap();
+        paramsMap.put("title", title);
+        paramsMap.put("authorUsername", authorUsername);
+        Filter filter = FilterUtility.buildFilter(paramsMap);
+
+        if(page != null){
+            pagedTopics = forumClient.findFilteredTopicsByPage(page.intValue(), Pagination.TOPIC_PAGINATION.getValue(), filter).getBody();
         } else{
-//            pagedTopics = backendCaller.getTopicsByPage(page, Pagination.TOPIC_PAGINATION.getValue(), title, username);
+            pagedTopics = forumClient.findFilteredTopicsByPage(0, Pagination.TOPIC_PAGINATION.getValue(), filter).getBody();
         }
-        setCommonAttributes(model, jwtToken);
+        setCommonAttributes(model, principal);
         model.addAttribute("title", title);
-        model.addAttribute("author", username);
-//        model.addAttribute("pagedTopics", pagedTopics);
+        model.addAttribute("pagedTopics", pagedTopics);
         return "forum-search";
     }
 
+
     @GetMapping(value = "/profile")
-    public String profilePage(Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        setCommonAttributes(model, jwtToken);
+    public String profilePage(Model model,
+                              Principal principal,
+                              HttpServletRequest req) throws Exception {
+        model.addAttribute("roles", KeycloakUtility.getRoles(req));
+        setCommonAttributes(model, principal);
         return "forum-profile";
     }
 
     @GetMapping (value = {"/forum", "/"})
-    public String forumPage(Model model, HttpServletRequest httpServletRequest, @RequestParam(required = false) Long page) throws Exception {
-//        PagedModel<EntityModel<SimpleTopicDTO>> pagedTopics = null;
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-//        Long totalUsers = backendCaller.getTotalUsers();
-//        Long totalTopics = backendCaller.getTotalTopics();
-//        Long totalPosts = backendCaller.getTotalPosts();
-        if(page == null) {
-//            pagedTopics = backendCaller.getTopicsByPage(0L, Pagination.TOPIC_PAGINATION.getValue(), null, null);
+    public String forumPage(Model model,
+                            HttpServletRequest req,
+                            Principal principal,
+                            @RequestParam(required = false) Long page) throws Exception {
+        Integer totalUsers = forumClient.getTotalUsers().getBody().intValue();
+        Integer totalTopics = forumClient.getTotalTopics().getBody().intValue();
+        Integer totalPosts =  forumClient.getTotalPosts().getBody().intValue();
+        PagedModel<EntityModel<VTopicDTO>> pagedTopics = null;
+        if (page != null){
+            pagedTopics = forumClient.findFilteredTopicsByPage(page.intValue(), Pagination.TOPIC_PAGINATION.getValue(), Filter.builder().build()).getBody();
+        } else {
+            pagedTopics = forumClient.findFilteredTopicsByPage(0, Pagination.TOPIC_PAGINATION.getValue(), Filter.builder().build()).getBody();
         }
-        else {
-//            pagedTopics = backendCaller.getTopicsByPage(page, Pagination.TOPIC_PAGINATION.getValue(), null, null);
-        }
-        setCommonAttributes(model, jwtToken);
-//        model.addAttribute("totalusers", totalUsers);
-//        model.addAttribute("totaltopics", totalTopics);
-//        model.addAttribute("totalposts", totalPosts);
-//        model.addAttribute("pagedTopics", pagedTopics);
+        pagedTopics.getMetadata().getTotalPages();
+        setCommonAttributes(model, principal);
+        model.addAttribute("totalusers", totalUsers);
+        model.addAttribute("totaltopics", totalTopics);
+        model.addAttribute("totalposts", totalPosts);
+        model.addAttribute("pagedTopics", pagedTopics);
         return "forum";
     }
 
 
-    @GetMapping (value = "/initresetcredentials")
-    public String resetCredentialsPage (Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        setCommonAttributes(model, jwtToken);
-        return "forum-init-reset";
-    }
-
-    @GetMapping (value = "/finishresetcredentials")
-    public String finishResetCredentialsPage (@RequestParam String token, @RequestParam String username, Model model, HttpServletRequest httpServletRequest) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-        model.addAttribute("reset_token", token);
-        model.addAttribute("username", username);
-        setCommonAttributes(model, jwtToken);
-        return "forum-finish-reset";
-    }
-
-
     @GetMapping (value="/viewtopic")
-    public String viewTopic(Model model, HttpServletRequest httpServletRequest, @RequestParam Long id, @RequestParam(required = false) Long page) throws Exception {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
+    public String viewTopic(Model model,
+                            HttpServletRequest req,
+                            @RequestParam Long id,
+                            @RequestParam(required = false) Long page,
+                            Principal principal) throws Exception {
         PagedModel<EntityModel<PostDTO>> postPageDTO = null;
-//        TopicDTO topicDTO = backendCaller.findTopic(id);
-        if(page == null) {
-//            postPageDTO = backendCaller.getPostsByPage(id, 0L, Pagination.POST_PAGINATION.getValue());
+        TopicDTO topicDTO = forumClient.findTopic(id).getBody().getContent();
+        if(page != null) {
+            postPageDTO = forumClient.findPostsByPage(id, page.intValue(), Pagination.POST_PAGINATION.getValue()).getBody();
         }
         else {
-//            postPageDTO = backendCaller.getPostsByPage(id, page, Pagination.POST_PAGINATION.getValue());
+            postPageDTO = forumClient.findPostsByPage(id, 0, Pagination.POST_PAGINATION.getValue()).getBody();
         }
-//        model.addAttribute("topic", topicDTO);
+        model.addAttribute("topic", topicDTO);
         model.addAttribute("pagedPosts", postPageDTO);
-        setCommonAttributes(model, jwtToken);
+        setCommonAttributes(model, principal);
         return "forum-single";
     }
 
     @GetMapping (value="/notification")
-    public String notification(Model model, HttpServletRequest httpServletRequest) {
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-//        List<NotificationDTO> notificationDTOList = backendCaller.getUserNotificationList(jwtToken);
-//        model.addAttribute("notificationList", notificationDTOList);
+    public String notification(Model model,
+                               HttpServletRequest httpServletRequest,
+                               Principal principal) {
+        CollectionModel<NotificationDTO> notificationDTOList = null;
+        if(principal != null){
+            notificationDTOList = forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+        }
+        model.addAttribute("notificationList", notificationDTOList);
         model.addAttribute("domain", valueUtility.getDomain());
         return "notification :: notification_fragment";
     }
 
     @GetMapping (value="/readedNotification")
     public @ResponseBody
-    void readedNotification (HttpServletRequest httpServletRequest){
-        String jwtToken = CookieUtility.getTokenFromCookie(httpServletRequest, CookieUtility.ACCESS_TOKEN_NAME);
-//        backendCaller.setReadedNotificationStatus(jwtToken);
+    void readedNotification (HttpServletRequest httpServletRequest,
+                             Principal principal){
+        if(principal != null) {
+            forumClient.setNotificationStatus(KeycloakUtility.getBearerTokenString(principal), false);
+        }
     }
 
 
-
-    private void setCommonAttributes (Model model, String jwtToken) throws Exception {
-//        SimpleUserDTO simpleUserDTO = backendCaller.getLoggedUser(jwtToken);
-//        List<NotificationDTO> notificationDTOList = backendCaller.getUserNotificationList(jwtToken);
-//        String buildVersionBE = backendCaller.getBuildVersionBackEnd();
-//        Boolean userNotificationStatus = backendCaller.getUserNotificationStatus(jwtToken);
-//        model.addAttribute("user", simpleUserDTO);
-//        model.addAttribute("token", jwtToken);
-//        model.addAttribute("domain", valueUtility.getDomain());
-//        model.addAttribute("sseBackend", valueUtility.getSseBackend());
-//        model.addAttribute("notificationList", notificationDTOList);
-//        model.addAttribute("userNotificationStatus", userNotificationStatus);
-//        model.addAttribute("buildVersionBE", buildVersionBE);
+    private void setCommonAttributes (Model model, Principal principal) throws Exception {
+        UserDTO userDTO = null;
+        Collection<NotificationDTO> notificationDTOList = null;
+        Boolean userNotificationStatus = null;
+        if(principal != null) {
+            userDTO = forumClient.retriveUser(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
+            CollectionModel<NotificationDTO> notifications = forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody();
+            if(notifications != null){
+                notificationDTOList =  forumClient.getUserNotificationList(KeycloakUtility.getBearerTokenString(principal)).getBody().getContent();
+            }
+            userNotificationStatus = forumClient.getUserNotificationStatus(KeycloakUtility.getBearerTokenString(principal)).getBody();
+            model.addAttribute("token", KeycloakUtility.getAccessTokenString(principal));
+        }
+        String buildVersionBE = forumClient.getBuildVersionBackEnd().getBody();
+        model.addAttribute("user", userDTO);
+        model.addAttribute("domain", valueUtility.getDomain());
+        model.addAttribute("sseBackend", valueUtility.getSseBackend());
+        model.addAttribute("notificationList", notificationDTOList);
+        model.addAttribute("userNotificationStatus", userNotificationStatus);
+        model.addAttribute("buildVersionBE", buildVersionBE);
         model.addAttribute("buildVersionFE", valueUtility.getBuildVersion());
     }
 

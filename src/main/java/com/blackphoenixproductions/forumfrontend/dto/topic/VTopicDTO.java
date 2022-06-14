@@ -1,8 +1,5 @@
-package com.blackphoenixproductions.forumfrontend.dto;
+package com.blackphoenixproductions.forumfrontend.dto.topic;
 
-
-import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.UserDTO;
 import com.blackphoenixproductions.forumfrontend.utility.DateUtility;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,29 +8,26 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationDTO implements Comparable<NotificationDTO>{
+public class VTopicDTO {
 
     private Long id;
-    private UserDTO fromUser;
-    private UserDTO toUser;
-    private TopicDTO topic;
+    private String title;
     private String message;
+    private boolean pinned;
+    private boolean emailUser;
     private LocalDateTime createDate;
+    private LocalDateTime deleteDate;
+    private LocalDateTime editDate;
+    private String authorUsername;
+    private String authorEmail;
     private String timeDifferenceFromNow;
-    private String url;
-
 
     public String getTimeDifferenceFromNow() {
         return DateUtility.setTimeDifferenceFromNow(createDate);
     }
 
-    @Override
-    public int compareTo(NotificationDTO o) {
-        return o.createDate.compareTo(this.createDate);
-    }
 }

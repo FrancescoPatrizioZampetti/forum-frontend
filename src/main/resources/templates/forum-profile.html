@@ -31,7 +31,7 @@
 					<img src="demos/forum/images/user.png" alt="Author" class="rounded-circle mr-3 border border-width-3 border-white" width="120" height="120">
 					<div>
 						<h2 class="h1 border-bottom border-dark border-width-4" style="font-weight: 800" th:text= "${user.username}"></h2>
-						<p class="mb-0">Ruolo: <strong th:text= "${user.role}"></strong></p>
+						<p class="mb-0">Ruolo: <strong th:text="${roles}"></strong></p>
 					</div>
 				</div>
 <!--				<ol class="breadcrumb">-->
@@ -76,7 +76,7 @@
 						<div class="col-md-6">
 							<ul class="list-unstyled mb-0">
 								<li class="py-2 text-larger">Username: <strong th:text= "${user.username}"></strong></li>
-								<li class="py-2 text-larger">Ruolo: <strong th:text= "${user.role}"></strong></li>
+								<li class="py-2 text-larger">Ruolo: <strong th:text= "${roles}"></strong></li>
 <!--								<li class="py-2 text-larger">Topic Aperti: <strong>1</strong></li>-->
 <!--								<li class="py-2 text-larger">Risposte Create: <strong>6876</strong></li>-->
 								<li class="py-2 text-larger">Email: <strong th:text= "${user.email}"></strong></li>

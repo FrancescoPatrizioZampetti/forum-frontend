@@ -90,7 +90,7 @@
                                     <a href="#" id="profilelink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="12,12"><img class="rounded-circle" src="demos/forum/images/user.png" alt="User"></a>
                                     <div class="dropdown-menu dropdown-menu-right py-0 m-0" aria-labelledby="profilelink">
 <!--                                        <a class="dropdown-item" href="/profile" style="color: white;"><i class="icon-line-edit mr-2"></i>Modifica Profilo</a>-->
-                                        <a class="dropdown-item" th:href="${'/search?username=' + user.username}" style="color: white;"><i class="icon-line-align-left mr-2"></i>I tuoi Topic</a>
+                                        <a class="dropdown-item" th:href="${'/search?authorUsername=' + user.username}" style="color: white;"><i class="icon-line-align-left mr-2"></i>I tuoi Topic</a>
                                         <a class="dropdown-item" href="logout" style="color: white;"><i class="icon-line-log-out mr-2"></i>Log Out</a>
                                     </div>
                                 </div>
