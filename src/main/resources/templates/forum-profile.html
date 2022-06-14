@@ -28,9 +28,15 @@
 		<section id="page-title" class="bg-color border-bottom-0">
 			<div class="container">
 				<div class="row align-items-center">
-					<img src="demos/forum/images/user.png" alt="Author" class="rounded-circle mr-3 border border-width-3 border-white" width="120" height="120">
+					<img src="demos/forum/images/user.png" alt="Author"
+						 class="rounded-circle mr-3 border border-width-3 border-white" width="120" height="120"
+						 th:if="${user.role == 'USER'}">
+					<img src="demos/forum/images/staff.png" alt="Author"
+						 class="rounded-circle mr-3 border border-width-3 border-white" width="120" height="120"
+						 th:if="${user.role == 'STAFF' or user.role == 'HELPDESK'}">
 					<div>
-						<h2 class="h1 border-bottom border-dark border-width-4" style="font-weight: 800" th:text= "${user.username}"></h2>
+						<h2 class="h1 border-bottom border-dark border-width-4" style="font-weight: 800"
+							th:text="${user.username}"></h2>
 						<p class="mb-0">Ruolo: <strong th:text="${roles}"></strong></p>
 					</div>
 				</div>
