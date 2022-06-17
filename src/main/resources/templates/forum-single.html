@@ -52,7 +52,8 @@
 										<span class="mb-0 h6 font-weight-semibold align-middle" th:text= "${topic.user.username}"></span>
 										<span class="badge badge-info text-white p-1 ml-1" th:if= "${topic.user.role == 'STAFF' or topic.user.role == 'HELPDESK'}">Staff</span>
 										<br>
-										<small class="text-muted mb-0 font-weight-normal" th:text= "${topic.formattedDate}"></small>
+										<small class="text-muted mb-0 font-weight-normal"
+											   th:text="${topic.formattedCreateDate}"></small>
 									</div>
 								</div>
 							</div>

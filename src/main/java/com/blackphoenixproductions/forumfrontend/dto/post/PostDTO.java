@@ -33,8 +33,8 @@ public class PostDTO {
 
     public String getFormattedEditDate() {
         String formattedDate = null;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Ultima modifica il' dd/MM/yy 'alle' HH:mm");
         if(editDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Ultima modifica il' dd/MM/yy 'alle' HH:mm");
             formattedDate = formatter.format(editDate);
         }
         return formattedDate;
