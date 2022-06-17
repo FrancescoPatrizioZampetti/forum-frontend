@@ -36,12 +36,11 @@ public class TopicController {
         String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setTitle(sanitizedTitle);
         topicDTO.setMessage(sanitizedMessage);
-        if(ValidationUtility.isValidTopicInput(topicDTO.getTitle(), topicDTO.getMessage())){
+        if (ValidationUtility.isValidTopicInput(topicDTO.getTitle(), topicDTO.getMessage())) {
             TopicDTO createdTopic = forumClient.createTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO).getBody().getContent();
             return "redirect:/viewtopic?id=" + createdTopic.getId();
-        } else{
-            return "redirect:/forum";
         }
+        return "redirect:/forum";
     }
 
     @PostMapping(value = "/editTopic")

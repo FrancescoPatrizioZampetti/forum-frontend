@@ -45,9 +45,7 @@ public class PostController {
             PagedModel<EntityModel<PostDTO>> postPageDTO = forumClient.findPostsByPage(topicId,0,10).getBody();
             return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages()-1);
         }
-        else{
-            return "redirect:/forum";
-        }
+        return "redirect:/forum";
     }
 
 
