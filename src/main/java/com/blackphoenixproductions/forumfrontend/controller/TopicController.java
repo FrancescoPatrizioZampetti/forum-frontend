@@ -36,7 +36,7 @@ public class TopicController {
         String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setTitle(sanitizedTitle);
         topicDTO.setMessage(sanitizedMessage);
-        if (ValidationUtility.isValidTopicInput(topicDTO.getTitle(), topicDTO.getMessage())) {
+        if (ValidationUtility.isValidTitle(topicDTO.getTitle()) && ValidationUtility.isValidMessage(topicDTO.getMessage())) {
             TopicDTO createdTopic = forumClient.createTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO).getBody().getContent();
             return "redirect:/viewtopic?id=" + createdTopic.getId();
         }
@@ -52,7 +52,7 @@ public class TopicController {
         String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setMessage(sanitizedMessage);
         topicDTO.setId(topicId);
-        if(ValidationUtility.isValidPostInput(topicDTO.getMessage())){
+        if (ValidationUtility.isValidMessage(topicDTO.getMessage())) {
             forumClient.editTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO);
         }
         return "redirect:/viewtopic?id=" + topicId + "&page=" + pageNumber;
