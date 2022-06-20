@@ -39,15 +39,13 @@ public class PostController {
                              HttpServletRequest httpServletRequest) throws Exception {
         String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
-        if(ValidationUtility.isValidPostInput(postDTO.getMessage())){
+        if (ValidationUtility.isValidMessage(postDTO.getMessage())) {
             postDTO.setTopicId(topicId);
             PostDTO createdPost = forumClient.createPost(KeycloakUtility.getBearerTokenString(principal), postDTO).getBody().getContent();
-            PagedModel<EntityModel<PostDTO>> postPageDTO = forumClient.findPostsByPage(topicId,0,10).getBody();
-            return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages()-1);
+            PagedModel<EntityModel<PostDTO>> postPageDTO = forumClient.findPostsByPage(topicId, 0, 10).getBody();
+            return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages() - 1);
         }
-        else{
-            return "redirect:/forum";
-        }
+        return "redirect:/forum";
     }
 
 
@@ -61,7 +59,7 @@ public class PostController {
         String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
         postDTO.setId(postId);
-        if(ValidationUtility.isValidPostInput(postDTO.getMessage())){
+        if (ValidationUtility.isValidMessage(postDTO.getMessage())) {
             forumClient.editPost(KeycloakUtility.getBearerTokenString(principal), postDTO);
         }
         return "redirect:/viewtopic?id=" + topicId + "&page=" + pageNumber;

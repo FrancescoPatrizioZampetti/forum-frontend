@@ -23,18 +23,18 @@ public class TopicDTO {
     private LocalDateTime deleteDate;
     private LocalDateTime editDate;
     private UserDTO user;
-    private String formattedDate;
+    private String formattedCreateDate;
     private String formattedEditDate;
 
-    public String getFormattedDate() {
+    public String getFormattedCreateDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Inviato il' dd/MM/yy 'alle' HH:mm");
         return formatter.format(createDate);
     }
 
     public String getFormattedEditDate() {
         String formattedDate = null;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Ultima modifica il' dd/MM/yy 'alle' HH:mm");
         if(editDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Ultima modifica il' dd/MM/yy 'alle' HH:mm");
             formattedDate = formatter.format(editDate);
         }
         return formattedDate;
