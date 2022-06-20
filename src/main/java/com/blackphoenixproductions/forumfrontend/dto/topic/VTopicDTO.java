@@ -25,6 +25,7 @@ public class VTopicDTO {
     private String authorUsername;
     private String authorEmail;
     private String timeDifferenceFromNow;
+    private Long postsNumber;
 
     public String getTimeDifferenceFromNow() {
         return DateUtility.setTimeDifferenceFromNow(createDate);
