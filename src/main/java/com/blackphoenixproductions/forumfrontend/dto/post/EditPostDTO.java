@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -14,7 +14,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class EditPostDTO {
     private Long id;
-    @NotBlank(message = "Il messaggio del post non può essere null/vuoto")
+    @NotEmpty(message = "Il messaggio del post non puo' essere null/vuoto")
+    @Size(max = 20000, message = "Il messaggio del post ha superato il massimo di 20000 caratteri")
     private String message;
 
     public EditPostDTO(Long id) {
