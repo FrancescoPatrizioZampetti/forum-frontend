@@ -8,7 +8,7 @@ import com.blackphoenixproductions.forumfrontend.dto.post.InsertPostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
@@ -37,7 +37,7 @@ public class PostController {
                              @RequestParam Long topicId,
                              Principal principal,
                              HttpServletRequest httpServletRequest) throws Exception {
-        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
         postDTO.setTopicId(topicId);
         PostDTO createdPost = forumClient.createPost(KeycloakUtility.getBearerTokenString(principal), postDTO).getBody().getContent();
@@ -53,7 +53,7 @@ public class PostController {
                            @RequestParam Long postId,
                            Principal principal,
                            HttpServletRequest httpServletRequest) throws Exception {
-        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
         postDTO.setId(postId);
         forumClient.editPost(KeycloakUtility.getBearerTokenString(principal), postDTO);

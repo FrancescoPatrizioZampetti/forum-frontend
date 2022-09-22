@@ -1,7 +1,7 @@
 package com.blackphoenixproductions.forumfrontend;
 
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -10,12 +10,12 @@ public class SanitizationTests {
 
     @Test
     public void test_input_sanitization(){
-        String input = Jsoup.clean("<script>console.log('errore');</script><a>link</a><p>xiao</p>", Whitelist.basic());
+        String input = Jsoup.clean("<script>console.log('errore');</script><a>link</a><p>xiao</p>", Safelist.basic());
         System.out.println(input);
-        input = Jsoup.clean("<script>console.log('errore');</script><br><a>link</a><p>wow</p>", Whitelist.none());
+        input = Jsoup.clean("<script>console.log('errore');</script><br><a>link</a><p>wow</p>", Safelist.none());
         System.out.println(input);
 //        input = Jsoup.clean("<script>console.log('errore');</script><br><a>link</a><p style = 'color:black;'></p>", Whitelist.relaxed().addTags("p").addAttributes("style"));
-        input = Jsoup.clean("<p style = ''></p><a script=''><script>ddd</script></a>", Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        input = Jsoup.clean("<p style = ''></p><a script=''><script>ddd</script></a>", Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         System.out.println(input);
     }
 

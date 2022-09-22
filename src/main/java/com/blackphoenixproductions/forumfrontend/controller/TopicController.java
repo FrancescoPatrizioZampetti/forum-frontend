@@ -7,7 +7,7 @@ import com.blackphoenixproductions.forumfrontend.dto.topic.InsertTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,8 +31,8 @@ public class TopicController {
     @PostMapping(value = "/createTopic")
     public String createTopic(@ModelAttribute @Valid InsertTopicDTO topicDTO,
                               Principal principal) {
-        String sanitizedTitle = Jsoup.clean(topicDTO.getTitle(), Whitelist.none());
-        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        String sanitizedTitle = Jsoup.clean(topicDTO.getTitle(), Safelist.none());
+        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setTitle(sanitizedTitle);
         topicDTO.setMessage(sanitizedMessage);
         TopicDTO createdTopic = forumClient.createTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO).getBody().getContent();
@@ -44,7 +44,7 @@ public class TopicController {
                             @RequestParam Long topicId,
                             @RequestParam Long pageNumber,
                             Principal principal) {
-        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setMessage(sanitizedMessage);
         topicDTO.setId(topicId);
         forumClient.editTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO);
