@@ -7,9 +7,8 @@ import com.blackphoenixproductions.forumfrontend.dto.post.EditPostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.InsertPostDTO;
 import com.blackphoenixproductions.forumfrontend.dto.post.PostDTO;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
-import com.blackphoenixproductions.forumfrontend.utility.ValidationUtility;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.security.Principal;
 
 @Controller
@@ -33,35 +33,30 @@ public class PostController {
 
 
     @PostMapping(value = "/createPost")
-    public String createPost(@ModelAttribute InsertPostDTO postDTO,
+    public String createPost(@ModelAttribute @Valid InsertPostDTO postDTO,
                              @RequestParam Long topicId,
                              Principal principal,
                              HttpServletRequest httpServletRequest) throws Exception {
-        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
-        if (ValidationUtility.isValidMessage(postDTO.getMessage())) {
-            postDTO.setTopicId(topicId);
-            PostDTO createdPost = forumClient.createPost(KeycloakUtility.getBearerTokenString(principal), postDTO).getBody().getContent();
-            PagedModel<EntityModel<PostDTO>> postPageDTO = forumClient.findPostsByPage(topicId, 0, 10).getBody();
-            return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages() - 1);
-        }
-        return "redirect:/forum";
+        postDTO.setTopicId(topicId);
+        PostDTO createdPost = forumClient.createPost(KeycloakUtility.getBearerTokenString(principal), postDTO).getBody().getContent();
+        PagedModel<EntityModel<PostDTO>> postPageDTO = forumClient.findPostsByPage(topicId, 0, 10).getBody();
+        return "redirect:/viewtopic?id=" + createdPost.getTopic().getId() + "&page=" + (postPageDTO.getMetadata().getTotalPages() - 1);
     }
 
 
     @PostMapping(value = "/editPost")
-    public String editPost(@ModelAttribute EditPostDTO postDTO,
+    public String editPost(@ModelAttribute @Valid EditPostDTO postDTO,
                            @RequestParam Long topicId,
                            @RequestParam Long pageNumber,
                            @RequestParam Long postId,
                            Principal principal,
                            HttpServletRequest httpServletRequest) throws Exception {
-        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+        String sanitizedMessage = Jsoup.clean(postDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         postDTO.setMessage(sanitizedMessage);
         postDTO.setId(postId);
-        if (ValidationUtility.isValidMessage(postDTO.getMessage())) {
-            forumClient.editPost(KeycloakUtility.getBearerTokenString(principal), postDTO);
-        }
+        forumClient.editPost(KeycloakUtility.getBearerTokenString(principal), postDTO);
         return "redirect:/viewtopic?id=" + topicId + "&page=" + pageNumber;
     }
 

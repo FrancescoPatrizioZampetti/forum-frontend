@@ -6,9 +6,8 @@ import com.blackphoenixproductions.forumfrontend.dto.topic.EditTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.InsertTopicDTO;
 import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
 import com.blackphoenixproductions.forumfrontend.security.KeycloakUtility;
-import com.blackphoenixproductions.forumfrontend.utility.ValidationUtility;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.security.Principal;
 
 @Controller
@@ -29,32 +29,25 @@ public class TopicController {
     }
 
     @PostMapping(value = "/createTopic")
-    public String createTopic(@ModelAttribute InsertTopicDTO topicDTO,
-                              Principal principal,
-                              HttpServletRequest httpServletRequest) throws Exception {
-        String sanitizedTitle = Jsoup.clean(topicDTO.getTitle(), Whitelist.none());
-        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+    public String createTopic(@ModelAttribute @Valid InsertTopicDTO topicDTO,
+                              Principal principal) {
+        String sanitizedTitle = Jsoup.clean(topicDTO.getTitle(), Safelist.none());
+        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setTitle(sanitizedTitle);
         topicDTO.setMessage(sanitizedMessage);
-        if (ValidationUtility.isValidTitle(topicDTO.getTitle()) && ValidationUtility.isValidMessage(topicDTO.getMessage())) {
-            TopicDTO createdTopic = forumClient.createTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO).getBody().getContent();
-            return "redirect:/viewtopic?id=" + createdTopic.getId();
-        }
-        return "redirect:/forum";
+        TopicDTO createdTopic = forumClient.createTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO).getBody().getContent();
+        return "redirect:/viewtopic?id=" + createdTopic.getId();
     }
 
     @PostMapping(value = "/editTopic")
-    public String editTopic(@ModelAttribute EditTopicDTO topicDTO,
+    public String editTopic(@ModelAttribute @Valid EditTopicDTO topicDTO,
                             @RequestParam Long topicId,
                             @RequestParam Long pageNumber,
-                            HttpServletRequest httpServletRequest,
-                            Principal principal) throws Exception {
-        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Whitelist.relaxed().addTags("p").addAttributes(":all", "style"));
+                            Principal principal) {
+        String sanitizedMessage = Jsoup.clean(topicDTO.getMessage(), Safelist.relaxed().addTags("p").addAttributes(":all", "style"));
         topicDTO.setMessage(sanitizedMessage);
         topicDTO.setId(topicId);
-        if (ValidationUtility.isValidMessage(topicDTO.getMessage())) {
-            forumClient.editTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO);
-        }
+        forumClient.editTopic(KeycloakUtility.getBearerTokenString(principal), topicDTO);
         return "redirect:/viewtopic?id=" + topicId + "&page=" + pageNumber;
     }
 
