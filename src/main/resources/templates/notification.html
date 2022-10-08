@@ -10,10 +10,18 @@
                     <span class="dropdown-header border-bottom border-f5 font-weight-medium text-uppercase ls1">Notifiche</span>
                     <div class="list-group list-group-flush" th:each="notification : ${notificationList}">
                         <a th:href="${domain} + ${notification.url}" class="d-flex list-group-item">
-                            <img src="demos/forum/images/user.png" width="35" height="35" class="rounded-circle mr-3 mt-1" alt="Profile" th:if= "${notification.fromUser.role != 'STAFF'}">
-                            <img src="demos/forum/images/staff.png" width="35" height="35" class="rounded-circle mr-3 mt-1" alt="Profile" th:if= "${notification.fromUser.role == 'STAFF'}">
+                            <img src="demos/forum/images/user.png" width="35" height="35"
+                                 class="rounded-circle mr-3 mt-1" alt="Profile"
+                                 th:if="${notification.fromUserRole != 'STAFF'}">
+                            <img src="demos/forum/images/staff.png" width="35" height="35"
+                                 class="rounded-circle mr-3 mt-1" alt="Profile" th:if="${notification.role == 'STAFF'}">
                             <div class="media-body">
-                                <h5 class="my-0 font-weight-normal text-muted"><span class="text-dark font-weight-bold" th:text="${notification.fromUser.username}"></span> ha risposto al tuo topic <span class="text-dark font-weight-bold" th:text="${notification.topic.title}"/> dicendo: <span class="text-dark font-weight-bold" th:utext="${notification.message}"></span></h5>
+                                <h5 class="my-0 font-weight-normal text-muted"><span class="text-dark font-weight-bold"
+                                                                                     th:text="${notification.fromUser}"></span>
+                                    ha risposto al tuo topic <span class="text-dark font-weight-bold"
+                                                                   th:text="${notification.topicTitle}"/> dicendo: <span
+                                            class="text-dark font-weight-bold"
+                                            th:utext="${notification.message}"></span></h5>
                                 <small class="text-smaller" th:text="${notification.timeDifferenceFromNow}"></small>
                             </div>
                         </a>
