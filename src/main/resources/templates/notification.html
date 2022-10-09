@@ -14,7 +14,8 @@
                                  class="rounded-circle mr-3 mt-1" alt="Profile"
                                  th:if="${notification.fromUserRole != 'STAFF'}">
                             <img src="demos/forum/images/staff.png" width="35" height="35"
-                                 class="rounded-circle mr-3 mt-1" alt="Profile" th:if="${notification.role == 'STAFF'}">
+                                 class="rounded-circle mr-3 mt-1" alt="Profile"
+                                 th:if="${notification.fromUserRole == 'STAFF'}">
                             <div class="media-body">
                                 <h5 class="my-0 font-weight-normal text-muted"><span class="text-dark font-weight-bold"
                                                                                      th:text="${notification.fromUser}"></span>
