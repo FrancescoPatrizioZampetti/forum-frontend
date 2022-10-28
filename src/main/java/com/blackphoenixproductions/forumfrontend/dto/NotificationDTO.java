@@ -1,8 +1,6 @@
 package com.blackphoenixproductions.forumfrontend.dto;
 
 
-import com.blackphoenixproductions.forumfrontend.dto.topic.TopicDTO;
-import com.blackphoenixproductions.forumfrontend.dto.user.UserDTO;
 import com.blackphoenixproductions.forumfrontend.utility.DateUtility;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,16 +14,17 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationDTO implements Comparable<NotificationDTO>{
+public class NotificationDTO implements Comparable<NotificationDTO> {
 
-    private Long id;
-    private UserDTO fromUser;
-    private UserDTO toUser;
-    private TopicDTO topic;
+    private String id;
+    private String fromUser;
+    private String fromUserRole;
+    private String toUser;
+    private String topicTitle;
     private String message;
+    private String url;
     private LocalDateTime createDate;
     private String timeDifferenceFromNow;
-    private String url;
 
 
     public String getTimeDifferenceFromNow() {
