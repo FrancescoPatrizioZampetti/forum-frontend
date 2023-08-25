@@ -107,7 +107,6 @@
             <artifactId>spring-cloud-dependencies</artifactId>
             <version>${version.spring.cloud}</version>
             <type>pom</type>
-            <scope>import</scope>
         </dependency>
 
         <dependency>
